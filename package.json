@@ -9,10 +9,14 @@
     "lint": "next lint --fix"
   },
   "dependencies": {
+    "@datocms/cma-client-browser": "^1.0.0",
+    "@hookform/error-message": "^2.0.0",
     "daisyui": "^2.15.3",
+    "graphql-request": "^4.3.0",
     "next": "12.1.6",
     "react": "18.2.0",
-    "react-dom": "18.2.0"
+    "react-dom": "18.2.0",
+    "react-hook-form": "^7.32.2"
   },
   "devDependencies": {
     "@types/node": "17.0.42",
@@ -25,6 +29,7 @@
     "eslint-config-next": "12.1.6",
     "eslint-config-prettier": "^8.5.0",
     "eslint-plugin-prettier": "^4.0.0",
+    "eslint-plugin-react": "^7.30.0",
     "eslint-plugin-tailwind": "^0.2.1",
     "postcss": "^8.4.14",
     "prettier": "^2.7.0",
