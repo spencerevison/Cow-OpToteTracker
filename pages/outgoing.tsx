@@ -1,6 +1,6 @@
 import type { NextPage } from "next";
 import Head from "next/head";
-import AdditionForm from "../components/AdditionForm";
+import OutgoingForm from "../components/OutgoingForm";
 import NavBar from "../components/NavBar";
 
 const Home: NextPage = () => {
@@ -19,7 +19,7 @@ const Home: NextPage = () => {
         <NavBar />
       </header>
       <main className="my-8 mx-4 sm:mx-8 md:mx-12">
-        <AdditionForm />
+        <OutgoingForm />
       </main>
     </>
   );

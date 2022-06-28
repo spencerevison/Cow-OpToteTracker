@@ -5,18 +5,19 @@ import CustomerName from "./CustomerName";
 import OrderId from "./OrderId";
 import ToteId from "./ToteId";
 import Alert from "./Alert";
+import { outgoingFormMachine } from "../machines/outgoing";
 
 interface FormInputs {
-  customerName: String;
-  orderId: String;
-  toteId: String;
+  customerName: string;
+  orderId: string;
+  toteId: string;
 }
 
 const client = buildClient({
   apiToken: process.env.NEXT_PUBLIC_DATOCMS_API_TOKEN || "",
 });
 
-const AdditionForm = () => {
+const OutgoingForm = () => {
   const {
     register,
     handleSubmit,
@@ -32,6 +33,7 @@ const AdditionForm = () => {
 
   const onSubmit: SubmitHandler<FormInputs> = async (data) => {
     try {
+      // TODO: Set state to loading
       clearTimeout(alertTimeout);
 
       // Retrieve any existing records with same IDs
@@ -58,6 +60,9 @@ const AdditionForm = () => {
           order_id: data.orderId,
           tote_id: data.toteId,
         });
+        // TODO: Handle creation error or set state to success
+      } else {
+        // TODO: Handle duplicate error
       }
 
       // Update state
@@ -73,15 +78,16 @@ const AdditionForm = () => {
 
   return (
     <>
-      <h1 className="text-lg">Log Outgoing Totes</h1>
+      <h1 className="text-2xl">Log Outgoing Totes</h1>
       <form onSubmit={handleSubmit(onSubmit)}>
         <CustomerName {...{ register, errors }} />
         <OrderId {...{ register, errors }} />
         <ToteId {...{ register, errors }} />
-        <button className="btn my-4">Add Tote</button>
+        <button className="btn my-4">Log Outgoing Tote</button>
         <Alert {...{ alertVisible, dupeRecord }} />
+        <progress className="progress w-56"></progress>
       </form>
     </>
   );
 };
-export default AdditionForm;
+export default OutgoingForm;

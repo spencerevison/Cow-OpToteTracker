@@ -1,6 +1,6 @@
 import type { NextPage } from "next";
 import Head from "next/head";
-import AdditionForm from "../components/AdditionForm";
+import AdditionForm from "../components/OutgoingForm";
 import NavBar from "../components/NavBar";
 
 const Home: NextPage = () => {
