@@ -12,6 +12,7 @@
   "dependencies": {
     "@datocms/cma-client-browser": "^1.0.0",
     "@hookform/error-message": "^2.0.0",
+    "@xstate/react": "^3.0.0",
     "daisyui": "^2.15.3",
     "graphql-request": "^4.3.0",
     "next": "12.1.6",

@@ -1,95 +1,171 @@
 import { createMachine } from "xstate";
+import { buildClient } from "@datocms/cma-client-browser";
+import { isContext } from "vm";
 
-type Event =
-  | { type: "SUBMIT"; status: string }
-  | { type: "RECORD_CREATED"; status: string }
-  | { type: "DUPLICATE_FOUND"; status: string }
-  | { type: "API_ERROR"; status: string };
+interface Context {
+  msg: string;
+  records: any[];
+  customerName: string;
+  orderId: string;
+  toteId: string;
+}
 
-export const outgoingFormMachine =
-  /** @xstate-layout N4IgpgJg5mDOIC5QHkCuAXKB7AlgOygAIAxLAJwFsA6HCAGzAGIBlAVQCEBZASQBVFQAByywc6HFjwCQAD0QBGAEwBmAGxVV8gOyKALAE4AHLu3z9ygDQgAnokVmqAVgAMrk7rVb581QF9fVmiYuAQk5NQAxgAWYBEA1qRkACKognQ4EQCG6EwQkmA0eABuWHEF0bEJ5ClpGdlg0sKi4pLScgiK+s5UzvKOqs6G+rpaw879VrYduoY9ruOKqsqOhoqKxv6BGNj4RImRMfGJNelZOYxgZGTkVGnZAGbhVBVH1amn9Y0iYhJSSLKILRLKgzXQedaqRTOLQzSaIZTmOauVSqVbyNTKQybEBBHahfbPQ5VZLvOrnJKsAAKABluABhACCvAAogB9YjIVgAOSSX2avzagOBoPBhkh0NhNnhukcSPGXj6ulUWmUWmxuJCeyeL2JJzJTAZlO4rOZACVTchTXyfq1-u0gcoQcZReKYYY4QgwfI5UDHIodANFurtpqwpRnmQwPUuWAAO6m2LkCCMPJ4Ar4EplCNRnIx+OJsgQa0tP6gdqdbq9fqDYajXTjVQe9H6OUmZxLeujYPBXZhyKR6NxhMRJMXK43O7oR7hiID3NDgtF-5NG2lgEdLo9PoDIYjMYTKUIHdOeb6eSDTTOAzdvFamdzsB54ej03MumWpKsumvpnM3nL74S0FDdK23Gs93rA8pjPOVlHRRwtEcbwlRvUMCVnHNHwXEdC0YQ1jTNC0rQA-lbTLOxNyrHda33RtD2rE9XEMdFDGcKENgCHEQ17AlYFQCIIjgWBGBkWB0HqKhMnuHIyAACihVwAEpGA1Hinj4gShOLAU7SFR0RWUCEoTdJtXFg1QVlVJZMVQtTwwgUkzjAZlxzIESxIkqSZPk+ZlNU-Engc2onJc64yG0sj128GDVmYrQHRWNZ3UPZQZTlBDvEcJUVTVTj-LvahMkEHBQvIdzxJySTpMuHylJU7iAvDIqStciK13aaLvVi7QEtWdYPTBdR61cUYUWUXp5F0fxOLwLAIDgaR8r7Gh6AaEjV2A+D1FWZw1GYtZFD9OipjMFt5l2+DEMy2zGoOSpjkcz51qA3SECQlsPEQ3RDv6SF-Q9ex1BcVxMVWZZDH6XKth7W7s0HfMcKXIRAJ08jPUUD1ERRZUlChfQvC6RwboKqgNME2B4Ge1H1yyrQqARdtEIRAZkUx3Q5UOxDRkcFYibyhqSaCj4clK8Kqcijq3CoIZjC8YwERMeQPWUBFW0hIYLKMPnodvZbmtFtrNt6RQnFGHRvpVwYDAG+sQXmVFDFVKEEWJvtDde+RkpOrFpqAA */
-  createMachine({
-    tsTypes: {} as import("./outgoing.typegen").Typegen0,
-    schema: { events: {} as Event },
-    id: "Outgoing Form",
-    initial: "idle",
-    states: {
-      idle: {
-        entry: "resetForm",
-        on: {
-          SUBMIT: {
-            target: "checkForDuplicate",
-          },
-        },
-      },
-      checkForDuplicate: {
-        invoke: {
-          src: "checkForDuplicate",
-          id: "checkForDuplicate",
-          onDone: [
-            {
-              target: "createNewRecord",
-            },
-          ],
-          onError: [
-            {
-              target: "apiError",
-            },
-          ],
-        },
-        on: {
-          DUPLICATE_FOUND: {
-            target: "duplicateError",
-          },
-          API_ERROR: {
-            target: "apiError",
-          },
-        },
-      },
-      createNewRecord: {
-        invoke: {
-          src: "createNewRecord",
-          id: "createNewRecord",
-          onDone: [
-            {
-              target: "success",
-            },
-          ],
-          onError: [
-            {
-              target: "apiError",
-            },
-          ],
-        },
-        on: {
-          RECORD_CREATED: {
-            target: "success",
-          },
-          API_ERROR: {
-            target: "apiError",
-          },
-        },
-      },
-      success: {
-        after: {
-          "2000": {
-            target: "idle",
-          },
-        },
-      },
-      duplicateError: {
-        after: {
-          "2000": {
-            target: "idle",
-          },
-        },
-      },
-      apiError: {
-        after: {
-          "2000": {
-            target: "idle",
-          },
+type Event = {
+  type: "SUBMIT";
+  customerName: string;
+  orderId: string;
+  toteId: string;
+};
+
+const client = buildClient({
+  apiToken: process.env.NEXT_PUBLIC_DATOCMS_API_TOKEN || "",
+});
+
+const fetchRecords = async (context) => {
+  context.records = await client.items.list({
+    filter: {
+      type: "tote",
+      fields: {
+        tote_id: {
+          eq: context.toteId,
         },
       },
     },
   });
+};
+
+const updateRecord = async (context) => {
+  for (const record of context.records) {
+    await client.items.update(record.id, {
+      customer_name: context.customerName,
+      order_id: context.orderId,
+      tote_id: context.toteId,
+    });
+  }
+};
+
+const createRecord = async (context) => {
+  await client.items.create({
+    item_type: {
+      type: "item_type",
+      id: process.env.NEXT_PUBLIC_DATOCMS_TOTE_MODEL_ID || "",
+    },
+    customer_name: context.customerName,
+    order_id: context.orderId,
+    tote_id: context.toteId,
+  });
+};
+
+const isNewRecord = ({ records }) => records.length === 0;
+const isDuplicateRecord = ({ records }) => records.length > 0;
+
+export const outgoingFormMachine =
+  /** @xstate-layout N4IgpgJg5mDOIC5QHkCuAXKB7AlgOygAIAxLAJwFsA6HCAGzAGIBlAVQCEBZASQBVFQAByywc6HFjwCQAD0QBGAAwAWAMxVFANgBMygKzbt8gOzztBgDQgAnolWrFGxc+VLNq5YuMAOAL6+rNExcAhJyagAzMHQAYwALfCgAJTAY8ghYRghJMBo8ADcsAGtcoOxEsMoqKNiEghS0sgyEfEKYgENxSQBtRQBdaWFRLqkkWQUVdS1dAyNTc20rWwRPR01140V5eVU9FW17f0CMctDSKpr4xIb0zLAyMnIqQTpOiPCqMpCic8joq-qqVuLQKWA6I16AzGQzEElGoDkCHkym8mioxk0eixPkUens5iWiGUaio9ns3i08m8yk0AE5NEcQF8Kr8qKhBBBOtcgU0sjk8oUSp8Tt9KtR2ZzxIDGhAQW0uT1+oMRLDJNJEdpvOpaTqdd59c59d5jISEKptLSqPINl5jA4vMS9IzmWcPhKudL0ox7o8yM9Xuh3lUXT83RyPckebLWmCFXhIcrhnD1YhNdrdbSjYb9SabIhNMptFaNrSvNpjLTzapnSKWR8yFHWOH0JBGDJYOhOrl2hEW2QABTaZyKACUjBDYqoDZlTclkETqvh4wQmm88ioeNLyNM8z0ylN5st1s0m2MducxkdNeCdaqMQbEZuvOyeFyMaFE9Z97Aj6jctjEJKtCKojCmCBplQGaZgaihGrmyzaJojjHie7jGOY7jyNepyhneD5SpGMreg8TwvG8Hyfh836-jK-7gnCCbAUmapjBqWqQRmWawTmpq0uuw6KKoOx6MYejbMotLYaKrLTukADC+Gtu2nYtlQPZ9oOw5jpRVSyU0Ck-i2EALqBrH5muG6qFuyg7mYe6mohyHrKhqjoXomFSbe1DtIIOAAKIkWQbYdl2am9vcmnONptaulUPn+YFJnJmZSIGHo6J2qoq5rkYJjwamSgbsOWVGCoej0v4AQgHgWAQHA0g6dQtAMElLEIogWponiZi4kOuxYg5FLFusxp0poSj6k6VWNdU-x1IRtytUuiJ2WiXiKAc3h6FtqLbaarjrlq9gjdM5r6J5sXis23IyktYGFvtDjDaJDi6OYZ7VtNMW4dQekQLOXbGUxi73capJmGoNKmFtSj5WaBzDWNpaFieKgXT9VDUQRT5A0IIHJe1KzGFQng6A49LyGJ3GaA52wcXq9KmJWXifccN6XVOUYGYDd0pSixNCboHgnlSVNw+YyiI5ie4nliWLo5O8UBb6vOEyYzjotL5UWltNmqKaOiOPSJ6bUJpY+Arvyq8uVKmlSTgCY7zjIpVvhAA */
+  createMachine(
+    {
+      tsTypes: {} as import("./outgoing.typegen").Typegen0,
+      schema: { events: {} as Event, context: {} as Context },
+      id: "Outgoing Form",
+      initial: "idle",
+      states: {
+        idle: {
+          on: {
+            SUBMIT: {
+              target: "fetchingRecords",
+              actions: "submit",
+            },
+          },
+        },
+        fetchingRecords: {
+          entry: "fetchingRecords",
+          invoke: {
+            src: fetchRecords,
+            onDone: [
+              {
+                cond: isDuplicateRecord,
+                target: "updatingRecord",
+              },
+              {
+                cond: isNewRecord,
+                target: "creatingRecord",
+              },
+            ],
+            onError: [
+              {
+                target: "apiError",
+              },
+            ],
+          },
+        },
+        updatingRecord: {
+          entry: "updatingRecord",
+          invoke: {
+            src: updateRecord,
+            onDone: [
+              {
+                target: "recordUpdated",
+              },
+            ],
+            onError: [
+              {
+                target: "apiError",
+              },
+            ],
+          },
+        },
+        recordUpdated: {
+          entry: ["resetForm", "recordUpdated"],
+          after: {
+            "2000": {
+              target: "idle",
+            },
+          },
+        },
+        creatingRecord: {
+          entry: "creatingRecord",
+          invoke: {
+            src: createRecord,
+            onDone: [
+              {
+                target: "recordCreated",
+              },
+            ],
+            onError: [
+              {
+                target: "apiError",
+              },
+            ],
+          },
+        },
+        recordCreated: {
+          entry: ["resetForm", "recordCreated"],
+          after: {
+            "2000": {
+              target: "idle",
+            },
+          },
+        },
+        apiError: {
+          after: {
+            "2000": {
+              target: "idle",
+            },
+          },
+        },
+      },
+    },
+    {
+      actions: {
+        submit: (context, event) => {
+          context.customerName = event.customerName;
+          context.orderId = event.orderId;
+          context.toteId = event.toteId;
+        },
+        fetchingRecords: (context) => (context.msg = "Fetching records"),
+        updatingRecord: (context) => (context.msg = "Updating record"),
+        recordUpdated: (context) => (context.msg = "Record updated"),
+        creatingRecord: (context) => (context.msg = "Creating record"),
+        recordCreated: (context) => (context.msg = "Record created"),
+      },
+    }
+  );

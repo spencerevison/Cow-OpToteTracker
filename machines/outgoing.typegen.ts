@@ -3,63 +3,63 @@
 export interface Typegen0 {
   "@@xstate/typegen": true;
   eventsCausingActions: {
+    submit: "SUBMIT";
+    fetchingRecords: "SUBMIT";
+    updatingRecord: "done.invoke.Outgoing Form.fetchingRecords:invocation[0]";
     resetForm:
-      | "xstate.after(2000)#Outgoing Form.success"
-      | "xstate.after(2000)#Outgoing Form.duplicateError"
-      | "xstate.after(2000)#Outgoing Form.apiError";
+      | "done.invoke.Outgoing Form.updatingRecord:invocation[0]"
+      | "done.invoke.Outgoing Form.creatingRecord:invocation[0]";
+    recordUpdated: "done.invoke.Outgoing Form.updatingRecord:invocation[0]";
+    creatingRecord: "done.invoke.Outgoing Form.fetchingRecords:invocation[0]";
+    recordCreated: "done.invoke.Outgoing Form.creatingRecord:invocation[0]";
   };
   internalEvents: {
-    "xstate.after(2000)#Outgoing Form.success": {
-      type: "xstate.after(2000)#Outgoing Form.success";
-    };
-    "xstate.after(2000)#Outgoing Form.duplicateError": {
-      type: "xstate.after(2000)#Outgoing Form.duplicateError";
-    };
-    "xstate.after(2000)#Outgoing Form.apiError": {
-      type: "xstate.after(2000)#Outgoing Form.apiError";
-    };
-    "done.invoke.createNewRecord": {
-      type: "done.invoke.createNewRecord";
+    "done.invoke.Outgoing Form.fetchingRecords:invocation[0]": {
+      type: "done.invoke.Outgoing Form.fetchingRecords:invocation[0]";
       data: unknown;
       __tip: "See the XState TS docs to learn how to strongly type this.";
     };
-    "error.platform.checkForDuplicate": {
-      type: "error.platform.checkForDuplicate";
-      data: unknown;
-    };
-    "error.platform.createNewRecord": {
-      type: "error.platform.createNewRecord";
-      data: unknown;
-    };
-    "done.invoke.checkForDuplicate": {
-      type: "done.invoke.checkForDuplicate";
+    "done.invoke.Outgoing Form.updatingRecord:invocation[0]": {
+      type: "done.invoke.Outgoing Form.updatingRecord:invocation[0]";
       data: unknown;
       __tip: "See the XState TS docs to learn how to strongly type this.";
+    };
+    "done.invoke.Outgoing Form.creatingRecord:invocation[0]": {
+      type: "done.invoke.Outgoing Form.creatingRecord:invocation[0]";
+      data: unknown;
+      __tip: "See the XState TS docs to learn how to strongly type this.";
+    };
+    "error.platform.Outgoing Form.fetchingRecords:invocation[0]": {
+      type: "error.platform.Outgoing Form.fetchingRecords:invocation[0]";
+      data: unknown;
+    };
+    "error.platform.Outgoing Form.updatingRecord:invocation[0]": {
+      type: "error.platform.Outgoing Form.updatingRecord:invocation[0]";
+      data: unknown;
+    };
+    "error.platform.Outgoing Form.creatingRecord:invocation[0]": {
+      type: "error.platform.Outgoing Form.creatingRecord:invocation[0]";
+      data: unknown;
     };
     "xstate.init": { type: "xstate.init" };
   };
-  invokeSrcNameMap: {
-    checkForDuplicate: "done.invoke.checkForDuplicate";
-    createNewRecord: "done.invoke.createNewRecord";
-  };
+  invokeSrcNameMap: {};
   missingImplementations: {
     actions: "resetForm";
-    services: "checkForDuplicate" | "createNewRecord";
+    services: never;
     guards: never;
     delays: never;
   };
-  eventsCausingServices: {
-    checkForDuplicate: "SUBMIT";
-    createNewRecord: "done.invoke.checkForDuplicate";
-  };
+  eventsCausingServices: {};
   eventsCausingGuards: {};
   eventsCausingDelays: {};
   matchesStates:
     | "idle"
-    | "checkForDuplicate"
-    | "createNewRecord"
-    | "success"
-    | "duplicateError"
+    | "fetchingRecords"
+    | "updatingRecord"
+    | "recordUpdated"
+    | "creatingRecord"
+    | "recordCreated"
     | "apiError";
   tags: never;
 }
