@@ -7,7 +7,7 @@ const Home: NextPage = () => {
   return (
     <>
       <Head>
-        <title>Cow-Op Barcode Scanner</title>
+        <title>Cow-Op Tote Tracker</title>
         <meta
           name="description"
           content="Utility application for tracking tote inventory"
