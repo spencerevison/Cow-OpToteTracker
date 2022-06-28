@@ -5,15 +5,12 @@ import { NEUTRAL, WARNING, SUCCESS, ERROR } from "../components/Alert";
 interface Context {
   msg: string;
   alertStatus: string;
-  customerName: string;
-  orderId: string;
+  records: any[];
   toteId: string;
 }
 
 type Event = {
   type: "SUBMIT";
-  customerName: string;
-  orderId: string;
   toteId: string;
 };
 
@@ -21,19 +18,21 @@ const client = buildClient({
   apiToken: process.env.NEXT_PUBLIC_DATOCMS_API_TOKEN || "",
 });
 
-export const outgoingFormMachine =
+const isRecordFound = (context) => context.records.length > 0;
+const isRecordNotFound = (context) => context.records.length === 0;
+
+export const incomingFormMachine =
   /** @xstate-layout N4IgpgJg5mDOIC5QHkCuAXKB7AlgOygAIAxLAJwFsA6HCAGzAGIBlAVQCEBZASQBVFQAByywc6HFjwCQAD0QBGAAwAWAMxVFANgBMygKzbt8gOzztBgDQgAnolWrFGxc+VLNq5YuMAOAL6+rNExcAhJyagAzMHQAYwALfCgAJTAY8ghYRghJMBo8ADcsAGtcoOxEsMoqKNiEghS0sgyEfEKYgENxSQBtRQBdaWFRLqkkWQUVdS1dAyNTc20rWwRPR01140V5eVU9FW17f0CMctDSKpr4xIb0zLAyMnIqQTpOiPCqMpCic8joq-qqVuLQKWA6I16AzGQzEElGoDkCHkym8mioxk0eixPkUens5iWiGUaio9ns3i08m8yk0AE5NEcQF8Kr8qKhBBBOtcgU0sjk8oUSp8Tt9KtR2ZzxIDGhAQW0uT1+oMRLDJNJEdpvOpaTqdd59c59d5jISEKptLSqPINl5jA4vMS9IzmWcPhKudL0ox7o8yM9Xuh3lUXT83RyPckebLWmCFXhIcrhnD1YhNdrdbSjYb9SabIhNMptFaNrSvNpjLTzapnSKWR8yFHWOH0JBGDJYOhOrl2hEW2QABTaZyKACUjBDYqoDZlTclkETqvh4wQmm88ioeNLyNM8z0ylN5st1s0m2MducxkdNeCdaqMQbEZuvOyeFyMaFE9Z97Aj6jctjEJKtCKojCmCBplQGaZgaihGrmyzaJojjHie7jGOY7jyNepyhneD5SpGMreg8TwvG8Hyfh836-jK-7gnCCbAUmapjBqWqQRmWawTmpq0uuw6KKoOx6MYejbMotLYaKrLTukADC+Gtu2nYtlQPZ9oOw5jpRVSyU0Ck-i2EALqBrH5muG6qFuyg7mYe6mohyHrKhqjoXomFSbe1DtIIOAAKIkWQbYdl2am9vcmnONptaulUPn+YFJnJmZSIGHo6J2qoq5rkYJjwamSgbsOWVGCoej0v4AQgHgWAQHA0g6dQtAMElLEIogWponiZi4kOuxYg5FLFusxp0poSj6k6VWNdU-x1IRtytUuiJ2WiXiKAc3h6FtqLbaarjrlq9gjdM5r6J5sXis23IyktYGFvtDjDaJDi6OYZ7VtNMW4dQekQLOXbGUxi73capJmGoNKmFtSj5WaBzDWNpaFieKgXT9VDUQRT5A0IIHJe1KzGFQng6A49LyGJ3GaA52wcXq9KmJWXifccN6XVOUYGYDd0pSixNCboHgnlSVNw+YyiI5ie4nliWLo5O8UBb6vOEyYzjotL5UWltNmqKaOiOPSJ6bUJpY+Arvyq8uVKmlSTgCY7zjIpVvhAA */
   createMachine(
     {
-      tsTypes: {} as import("./outgoing.typegen").Typegen0,
+      tsTypes: {} as import("./incoming.typegen").Typegen0,
       schema: { events: {} as Event, context: {} as Context },
-      id: "Outgoing Form",
+      id: "Incoming Form",
       initial: "idle",
       context: {
-        msg: "Enter info for next tote:",
+        msg: "Enter ID for next tote:",
         alertStatus: "neutral",
-        customerName: "",
-        orderId: "",
+        records: [],
         toteId: "",
       },
       states: {
@@ -41,37 +40,46 @@ export const outgoingFormMachine =
           entry: "idle",
           on: {
             SUBMIT: {
-              target: "creatingRecord",
+              target: "fetchRecord",
               actions: "submit",
             },
           },
         },
-        creatingRecord: {
-          entry: "creatingRecord",
+        fetchRecord: {
+          entry: "fetchRecord",
           invoke: {
-            src: "createRecord",
-            onDone: "recordCreated",
-            onError: "updatingRecord",
+            src: "fetchRecord",
+            onDone: [
+              {
+                target: "deletingRecord",
+                cond: isRecordFound,
+              },
+              {
+                target: "recordNotFound",
+                cond: isRecordNotFound,
+              },
+            ],
+            onError: "apiError",
           },
         },
-        recordCreated: {
-          entry: ["resetForm", "recordCreated"],
+        recordNotFound: {
+          entry: "recordNotFound",
           after: {
             "2000": {
               target: "idle",
             },
           },
         },
-        updatingRecord: {
-          entry: "updatingRecord",
+        deletingRecord: {
+          entry: "deletingRecord",
           invoke: {
-            src: "updateRecord",
-            onDone: "recordUpdated",
+            src: "deleteRecord",
+            onDone: "recordDeleted",
             onError: "apiError",
           },
         },
-        recordUpdated: {
-          entry: ["resetForm", "recordUpdated"],
+        recordDeleted: {
+          entry: ["resetForm", "recordDeleted"],
           after: {
             "2000": {
               target: "idle",
@@ -91,28 +99,26 @@ export const outgoingFormMachine =
     {
       actions: {
         submit: (context, event) => {
-          context.customerName = event.customerName;
-          context.orderId = event.orderId;
           context.toteId = event.toteId;
         },
         idle: (context) => {
-          context.msg = "Enter info for next tote:";
+          context.msg = "Enter ID for next tote:";
           context.alertStatus = NEUTRAL;
         },
-        updatingRecord: (context) => {
-          context.msg = "Duplicate record found.";
+        fetchRecord: (context) => {
+          context.msg = "Looking for record...";
+          context.alertStatus = NEUTRAL;
+        },
+        recordNotFound: (context) => {
+          context.msg = "Record not found.";
           context.alertStatus = WARNING;
         },
-        recordUpdated: (context) => {
-          context.msg = "Record has been updated.";
-          context.alertStatus = SUCCESS;
-        },
-        creatingRecord: (context) => {
-          context.msg = "Creating new record...";
+        deletingRecord: (context) => {
+          context.msg = "Deleting record...";
           context.alertStatus = NEUTRAL;
         },
-        recordCreated: (context) => {
-          context.msg = "New record created.";
+        recordDeleted: (context) => {
+          context.msg = "Record has been deleted.";
           context.alertStatus = SUCCESS;
         },
         apiError: (context) => {
@@ -121,19 +127,8 @@ export const outgoingFormMachine =
         },
       },
       services: {
-        createRecord: async (context) => {
-          await client.items.create({
-            item_type: {
-              type: "item_type",
-              id: process.env.NEXT_PUBLIC_DATOCMS_TOTE_MODEL_ID || "",
-            },
-            customer_name: context.customerName,
-            order_id: context.orderId,
-            tote_id: context.toteId,
-          });
-        },
-        updateRecord: async (context) => {
-          const existingRecords = await client.items.list({
+        fetchRecord: async (context) => {
+          context.records = await client.items.list({
             filter: {
               type: "tote",
               fields: {
@@ -143,13 +138,10 @@ export const outgoingFormMachine =
               },
             },
           });
-
-          for (const record of existingRecords) {
-            await client.items.update(record.id, {
-              customer_name: context.customerName,
-              order_id: context.orderId,
-              tote_id: context.toteId,
-            });
+        },
+        deleteRecord: async (context) => {
+          for (const record of context.records) {
+            await client.items.destroy(record.id);
           }
         },
       },

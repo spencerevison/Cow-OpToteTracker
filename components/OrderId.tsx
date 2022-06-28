@@ -10,7 +10,7 @@ type OrderIdProps = {
 const OrderId: React.FC<OrderIdProps> = ({ register, errors }) => {
   return (
     <>
-      <label className="input-group mt-4 w-auto">
+      <label className="input-group mt-4 w-auto justify-center">
         <span className="w-40">Order ID</span>
         <input
           {...register("orderId", {

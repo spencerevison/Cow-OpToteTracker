@@ -7,7 +7,7 @@ type CustomerNameProps = {
 const CustomerName: React.FC<CustomerNameProps> = (props) => {
   const { register } = props;
   return (
-    <label className="input-group my-4">
+    <label className="input-group my-4 justify-center">
       <span className="w-40">Customer Name</span>
       <input
         {...register("customerName")}

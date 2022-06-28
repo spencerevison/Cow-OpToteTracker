@@ -10,7 +10,7 @@ type ToteIdProps = {
 const ToteId: React.FC<ToteIdProps> = ({ register, errors }) => {
   return (
     <>
-      <label className="input-group mt-4">
+      <label className="input-group mt-4 justify-center">
         <span className="w-40">Tote ID</span>
         <input
           {...register("toteId", {

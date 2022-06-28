@@ -1,8 +1,10 @@
-import React, { useState } from "react";
+import React from "react";
 import { useForm, SubmitHandler } from "react-hook-form";
 import { buildClient } from "@datocms/cma-client-browser";
+import { useMachine } from "@xstate/react";
 import ToteId from "./ToteId";
 import Alert from "./Alert";
+import { incomingFormMachine } from "../machines/incoming";
 
 interface FormInputs {
   customerName: string;
@@ -10,62 +12,47 @@ interface FormInputs {
   toteId: string;
 }
 
-const client = buildClient({
-  apiToken: process.env.NEXT_PUBLIC_DATOCMS_API_TOKEN || "",
-});
-
 const IncomingForm = () => {
   const {
     register,
+    reset,
     handleSubmit,
     formState: { errors },
   } = useForm<FormInputs>({
     criteriaMode: "all",
   });
 
-  const [alertVisible, setAlertVisible] = useState(false);
-
-  let alertTimeout: ReturnType<typeof setTimeout>;
+  const [state, send] = useMachine(incomingFormMachine, {
+    actions: {
+      resetForm: () => {
+        reset();
+      },
+    },
+  });
 
   const onSubmit: SubmitHandler<FormInputs> = async (data) => {
-    try {
-      // Retrieve any existing records with same IDs
-      const existingRecords = await client.items.list({
-        filter: {
-          type: "tote",
-          fields: {
-            tote_id: {
-              eq: data.toteId,
-            },
-          },
-        },
-      });
-
-      if (existingRecords.length) {
-        let failure = false;
-        existingRecords.forEach(async (record) => {
-          const deletedRecord = await client.items.destroy(record.id);
-          if (deletedRecord.tote_id !== record.tote_id) {
-            failure = true;
-          }
-        });
-        // TODO: Handle deletion error
-      } else {
-        // TODO: Handle record not found error
-      }
-    } catch (e) {
-      console.log(e);
-    }
+    send({
+      type: "SUBMIT",
+      toteId: data.toteId,
+    });
   };
 
+  const showProgress = ["fetchRecord", "deletingRecord"].some(state.matches);
+
   return (
-    <>
+    <div className="text-center">
       <h1 className="text-2xl">Log Incoming Totes</h1>
+      <progress
+        className={`progress mx-auto my-4 block w-56 ${
+          !showProgress && "opacity-0"
+        }`}
+      ></progress>
+      <Alert msg={state.context.msg} status={state.context.alertStatus} />
       <form onSubmit={handleSubmit(onSubmit)}>
         <ToteId {...{ register, errors }} />
         <button className="btn my-4">Log Incoming Tote</button>
       </form>
-    </>
+    </div>
   );
 };
 export default IncomingForm;
