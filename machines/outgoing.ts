@@ -1,10 +1,10 @@
 import { createMachine } from "xstate";
 import { buildClient } from "@datocms/cma-client-browser";
-import { isContext } from "vm";
+import { NEUTRAL, WARNING, SUCCESS, ERROR } from "../components/Alert";
 
 interface Context {
   msg: string;
-  records: any[];
+  alertStatus: string;
   customerName: string;
   orderId: string;
   toteId: string;
@@ -21,44 +21,6 @@ const client = buildClient({
   apiToken: process.env.NEXT_PUBLIC_DATOCMS_API_TOKEN || "",
 });
 
-const fetchRecords = async (context) => {
-  context.records = await client.items.list({
-    filter: {
-      type: "tote",
-      fields: {
-        tote_id: {
-          eq: context.toteId,
-        },
-      },
-    },
-  });
-};
-
-const updateRecord = async (context) => {
-  for (const record of context.records) {
-    await client.items.update(record.id, {
-      customer_name: context.customerName,
-      order_id: context.orderId,
-      tote_id: context.toteId,
-    });
-  }
-};
-
-const createRecord = async (context) => {
-  await client.items.create({
-    item_type: {
-      type: "item_type",
-      id: process.env.NEXT_PUBLIC_DATOCMS_TOTE_MODEL_ID || "",
-    },
-    customer_name: context.customerName,
-    order_id: context.orderId,
-    tote_id: context.toteId,
-  });
-};
-
-const isNewRecord = ({ records }) => records.length === 0;
-const isDuplicateRecord = ({ records }) => records.length > 0;
-
 export const outgoingFormMachine =
   /** @xstate-layout N4IgpgJg5mDOIC5QHkCuAXKB7AlgOygAIAxLAJwFsA6HCAGzAGIBlAVQCEBZASQBVFQAByywc6HFjwCQAD0QBGAAwAWAMxVFANgBMygKzbt8gOzztBgDQgAnolWrFGxc+VLNq5YuMAOAL6+rNExcAhJyagAzMHQAYwALfCgAJTAY8ghYRghJMBo8ADcsAGtcoOxEsMoqKNiEghS0sgyEfEKYgENxSQBtRQBdaWFRLqkkWQUVdS1dAyNTc20rWwRPR01140V5eVU9FW17f0CMctDSKpr4xIb0zLAyMnIqQTpOiPCqMpCic8joq-qqVuLQKWA6I16AzGQzEElGoDkCHkym8mioxk0eixPkUens5iWiGUaio9ns3i08m8yk0AE5NEcQF8Kr8qKhBBBOtcgU0sjk8oUSp8Tt9KtR2ZzxIDGhAQW0uT1+oMRLDJNJEdpvOpaTqdd59c59d5jISEKptLSqPINl5jA4vMS9IzmWcPhKudL0ox7o8yM9Xuh3lUXT83RyPckebLWmCFXhIcrhnD1YhNdrdbSjYb9SabIhNMptFaNrSvNpjLTzapnSKWR8yFHWOH0JBGDJYOhOrl2hEW2QABTaZyKACUjBDYqoDZlTclkETqvh4wQmm88ioeNLyNM8z0ylN5st1s0m2MducxkdNeCdaqMQbEZuvOyeFyMaFE9Z97Aj6jctjEJKtCKojCmCBplQGaZgaihGrmyzaJojjHie7jGOY7jyNepyhneD5SpGMreg8TwvG8Hyfh836-jK-7gnCCbAUmapjBqWqQRmWawTmpq0uuw6KKoOx6MYejbMotLYaKrLTukADC+Gtu2nYtlQPZ9oOw5jpRVSyU0Ck-i2EALqBrH5muG6qFuyg7mYe6mohyHrKhqjoXomFSbe1DtIIOAAKIkWQbYdl2am9vcmnONptaulUPn+YFJnJmZSIGHo6J2qoq5rkYJjwamSgbsOWVGCoej0v4AQgHgWAQHA0g6dQtAMElLEIogWponiZi4kOuxYg5FLFusxp0poSj6k6VWNdU-x1IRtytUuiJ2WiXiKAc3h6FtqLbaarjrlq9gjdM5r6J5sXis23IyktYGFvtDjDaJDi6OYZ7VtNMW4dQekQLOXbGUxi73capJmGoNKmFtSj5WaBzDWNpaFieKgXT9VDUQRT5A0IIHJe1KzGFQng6A49LyGJ3GaA52wcXq9KmJWXifccN6XVOUYGYDd0pSixNCboHgnlSVNw+YyiI5ie4nliWLo5O8UBb6vOEyYzjotL5UWltNmqKaOiOPSJ6bUJpY+Arvyq8uVKmlSTgCY7zjIpVvhAA */
   createMachine(
@@ -67,74 +29,29 @@ export const outgoingFormMachine =
       schema: { events: {} as Event, context: {} as Context },
       id: "Outgoing Form",
       initial: "idle",
+      context: {
+        msg: "Ready for next entry.",
+        alertStatus: "neutral",
+        customerName: "",
+        orderId: "",
+        toteId: "",
+      },
       states: {
         idle: {
+          entry: "idle",
           on: {
             SUBMIT: {
-              target: "fetchingRecords",
+              target: "creatingRecord",
               actions: "submit",
-            },
-          },
-        },
-        fetchingRecords: {
-          entry: "fetchingRecords",
-          invoke: {
-            src: fetchRecords,
-            onDone: [
-              {
-                cond: isDuplicateRecord,
-                target: "updatingRecord",
-              },
-              {
-                cond: isNewRecord,
-                target: "creatingRecord",
-              },
-            ],
-            onError: [
-              {
-                target: "apiError",
-              },
-            ],
-          },
-        },
-        updatingRecord: {
-          entry: "updatingRecord",
-          invoke: {
-            src: updateRecord,
-            onDone: [
-              {
-                target: "recordUpdated",
-              },
-            ],
-            onError: [
-              {
-                target: "apiError",
-              },
-            ],
-          },
-        },
-        recordUpdated: {
-          entry: ["resetForm", "recordUpdated"],
-          after: {
-            "2000": {
-              target: "idle",
             },
           },
         },
         creatingRecord: {
           entry: "creatingRecord",
           invoke: {
-            src: createRecord,
-            onDone: [
-              {
-                target: "recordCreated",
-              },
-            ],
-            onError: [
-              {
-                target: "apiError",
-              },
-            ],
+            src: "createRecord",
+            onDone: "recordCreated",
+            onError: "updatingRecord",
           },
         },
         recordCreated: {
@@ -145,7 +62,24 @@ export const outgoingFormMachine =
             },
           },
         },
+        updatingRecord: {
+          entry: "updatingRecord",
+          invoke: {
+            src: "updateRecord",
+            onDone: "recordUpdated",
+            onError: "apiError",
+          },
+        },
+        recordUpdated: {
+          entry: ["resetForm", "recordUpdated"],
+          after: {
+            "2000": {
+              target: "idle",
+            },
+          },
+        },
         apiError: {
+          entry: "apiError",
           after: {
             "2000": {
               target: "idle",
@@ -161,11 +95,63 @@ export const outgoingFormMachine =
           context.orderId = event.orderId;
           context.toteId = event.toteId;
         },
-        fetchingRecords: (context) => (context.msg = "Fetching records"),
-        updatingRecord: (context) => (context.msg = "Updating record"),
-        recordUpdated: (context) => (context.msg = "Record updated"),
-        creatingRecord: (context) => (context.msg = "Creating record"),
-        recordCreated: (context) => (context.msg = "Record created"),
+        idle: (context) => {
+          context.msg = "Ready for next entry.";
+          context.alertStatus = NEUTRAL;
+        },
+        updatingRecord: (context) => {
+          context.msg = "Duplicate record found.";
+          context.alertStatus = WARNING;
+        },
+        recordUpdated: (context) => {
+          context.msg = "Record has been updated.";
+          context.alertStatus = SUCCESS;
+        },
+        creatingRecord: (context) => {
+          context.msg = "Attempting to create new record.";
+          context.alertStatus = NEUTRAL;
+        },
+        recordCreated: (context) => {
+          context.msg = "New record created.";
+          context.alertStatus = SUCCESS;
+        },
+        apiError: (context) => {
+          context.msg = "Oops! We ran into a problem creating that record.";
+          context.alertStatus = ERROR;
+        },
+      },
+      services: {
+        createRecord: async (context) => {
+          await client.items.create({
+            item_type: {
+              type: "item_type",
+              id: process.env.NEXT_PUBLIC_DATOCMS_TOTE_MODEL_ID || "",
+            },
+            customer_name: context.customerName,
+            order_id: context.orderId,
+            tote_id: context.toteId,
+          });
+        },
+        updateRecord: async (context) => {
+          const existingRecords = await client.items.list({
+            filter: {
+              type: "tote",
+              fields: {
+                tote_id: {
+                  eq: context.toteId,
+                },
+              },
+            },
+          });
+
+          for (const record of existingRecords) {
+            await client.items.update(record.id, {
+              customer_name: context.customerName,
+              order_id: context.orderId,
+              tote_id: context.toteId,
+            });
+          }
+        },
       },
     }
   );

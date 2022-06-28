@@ -1,52 +1,36 @@
 import React from "react";
+import NeutralIcon from "../assets/svg/neutral-icon.svg";
+import WarningIcon from "../assets/svg/warning-icon.svg";
+import ErrorIcon from "../assets/svg/error-icon.svg";
+import SuccessIcon from "../assets/svg/success-icon.svg";
+
+export const NEUTRAL = "neutral";
+export const WARNING = "warning";
+export const ERROR = "error";
+export const SUCCESS = "success";
 
 type AlertProps = {
   msg: string;
-  failure: boolean;
+  status: string;
 };
 
-const Alert: React.FC<AlertProps> = ({ msg, failure }) => {
+const Alert: React.FC<AlertProps> = ({ msg, status }) => {
   return (
     <div
-      className={`alert shadow-lg ease-in ${
-        failure ? "alert-error" : "alert-success"
-      }`}
+      className={`alert shadow-lg ease-in
+      ${status === NEUTRAL && "opacity-0"}
+      ${status === WARNING && "alert-warning"}
+      ${status === SUCCESS && "alert-success"}
+      ${status === ERROR && "alert-error"}
+    `}
     >
-      {failure ? (
-        <div>
-          <svg
-            xmlns="http://www.w3.org/2000/svg"
-            className="h-6 w-6 flex-shrink-0 stroke-current"
-            fill="none"
-            viewBox="0 0 24 24"
-          >
-            <path
-              strokeLinecap="round"
-              strokeLinejoin="round"
-              strokeWidth="2"
-              d="M10 14l2-2m0 0l2-2m-2 2l-2-2m2 2l2 2m7-2a9 9 0 11-18 0 9 9 0 0118 0z"
-            />
-          </svg>
-          <span>{msg}</span>
-        </div>
-      ) : (
-        <div>
-          <svg
-            xmlns="http://www.w3.org/2000/svg"
-            className="h-6 w-6 flex-shrink-0 stroke-current"
-            fill="none"
-            viewBox="0 0 24 24"
-          >
-            <path
-              strokeLinecap="round"
-              strokeLinejoin="round"
-              strokeWidth="2"
-              d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z"
-            />
-          </svg>
-          <span>{msg}</span>
-        </div>
-      )}
+      <div>
+        {status === NEUTRAL && <NeutralIcon />}
+        {status === WARNING && <WarningIcon />}
+        {status === SUCCESS && <SuccessIcon />}
+        {status === ERROR && <ErrorIcon />}
+        <span>{msg}</span>
+      </div>
     </div>
   );
 };

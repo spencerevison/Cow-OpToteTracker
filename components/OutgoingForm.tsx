@@ -1,4 +1,4 @@
-import React, { useEffect } from "react";
+import React from "react";
 import { useForm, SubmitHandler } from "react-hook-form";
 import { buildClient } from "@datocms/cma-client-browser";
 import { useMachine } from "@xstate/react";
@@ -21,7 +21,6 @@ const client = buildClient({
 const OutgoingForm = () => {
   const {
     register,
-    watch,
     handleSubmit,
     reset,
     formState: { errors },
@@ -46,15 +45,7 @@ const OutgoingForm = () => {
     });
   };
 
-  const showProgress = [
-    "fetchingRecords",
-    "updatingRecord",
-    "creatingRecord",
-  ].some(state.matches);
-
-  const showAlert = ["recordUpdated", "recordCreated", "apiError"].some(
-    state.matches
-  );
+  const showProgress = ["updatingRecord", "creatingRecord"].some(state.matches);
 
   return (
     <>
@@ -64,9 +55,7 @@ const OutgoingForm = () => {
         <OrderId {...{ register, errors }} />
         <ToteId {...{ register, errors }} />
         <button className="btn my-4">Log Outgoing Tote</button>
-        {showAlert && (
-          <Alert msg={state.context.msg} failure={state.matches("apiError")} />
-        )}
+        <Alert msg={state.context.msg} status={state.context.alertStatus} />
         {showProgress && <progress className="progress block w-56"></progress>}
       </form>
     </>

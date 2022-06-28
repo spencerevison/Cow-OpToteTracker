@@ -1,6 +1,6 @@
 import React from "react";
 import { ErrorMessage } from "@hookform/error-message";
-import { FieldErrors } from "../types";
+import { FieldErrors } from "../types/hookForms";
 
 type OrderIdProps = {
   register: Function;
