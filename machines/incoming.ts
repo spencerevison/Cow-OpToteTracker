@@ -122,7 +122,7 @@ export const incomingFormMachine =
           context.alertStatus = SUCCESS;
         },
         apiError: (context) => {
-          context.msg = "Oops! We ran into a problem creating that record.";
+          context.msg = "Oops! An error was encountered.";
           context.alertStatus = ERROR;
         },
       },
