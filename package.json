@@ -6,8 +6,7 @@
     "dev": "next dev",
     "build": "next build",
     "start": "next start",
-    "lint": "next lint --fix",
-    "postinstall": "xstate typegen \"./machines/**/*.ts?(x)\""
+    "lint": "next lint --fix"
   },
   "dependencies": {
     "@datocms/cma-client-browser": "^1.0.0",
