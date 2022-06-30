@@ -1,6 +1,5 @@
 import React from "react";
 import { useForm, SubmitHandler } from "react-hook-form";
-import { buildClient } from "@datocms/cma-client-browser";
 import { useMachine } from "@xstate/react";
 import ToteId from "./ToteId";
 import Alert from "./Alert";
