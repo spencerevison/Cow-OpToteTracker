@@ -1,7 +1,5 @@
 import { createMachine } from "xstate";
-import { buildClient } from "@datocms/cma-client-browser";
 import { NEUTRAL, WARNING, SUCCESS, ERROR } from "../components/Alert";
-
 interface Context {
   msg: string;
   alertStatus: string;
@@ -13,10 +11,6 @@ type Event = {
   type: "SUBMIT";
   toteId: string;
 };
-
-const client = buildClient({
-  apiToken: process.env.NEXT_PUBLIC_DATOCMS_API_TOKEN || "",
-});
 
 const isRecordFound = (context) => context.records.length > 0;
 const isRecordNotFound = (context) => context.records.length === 0;
@@ -127,22 +121,23 @@ export const incomingFormMachine =
         },
       },
       services: {
-        fetchRecord: async (context) => {
-          context.records = await client.items.list({
-            filter: {
-              type: "tote",
-              fields: {
-                tote_id: {
-                  eq: context.toteId,
-                },
-              },
-            },
-          });
+        fetchRecord: (context) => {
+          return fetch("/.netlify/functions/fetch-record", {
+            method: "POST",
+            body: JSON.stringify({ toteId: context.toteId }),
+          })
+            .then((response) => response.json())
+            .then((data) => (context.records = data.records));
         },
-        deleteRecord: async (context) => {
-          for (const record of context.records) {
-            await client.items.destroy(record.id);
-          }
+        deleteRecord: (context) => {
+          return fetch("/.netlify/functions/delete-record", {
+            method: "POST",
+            body: JSON.stringify({ id: context.records[0].id }),
+          }).then((response) => {
+            if (!response.ok) {
+              throw Error;
+            }
+          });
         },
       },
     }

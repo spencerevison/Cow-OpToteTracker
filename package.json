@@ -9,8 +9,9 @@
     "lint": "next lint --fix"
   },
   "dependencies": {
-    "@datocms/cma-client-browser": "^1.0.0",
+    "@datocms/cma-client-node": "^1.0.0",
     "@hookform/error-message": "^2.0.0",
+    "@netlify/functions": "^1.0.0",
     "@svgr/webpack": "^6.2.1",
     "@xstate/react": "^3.0.0",
     "daisyui": "^2.15.3",

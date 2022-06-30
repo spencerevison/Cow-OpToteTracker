@@ -15,7 +15,9 @@ export interface Typegen0 {
     recordCreated: "done.invoke.Outgoing Form.creatingRecord:invocation[0]";
     updatingRecord: "error.platform.Outgoing Form.creatingRecord:invocation[0]";
     recordUpdated: "done.invoke.Outgoing Form.updatingRecord:invocation[0]";
-    apiError: "error.platform.Outgoing Form.updatingRecord:invocation[0]";
+    apiError:
+      | "error.platform.Outgoing Form.creatingRecord:invocation[0]"
+      | "error.platform.Outgoing Form.updatingRecord:invocation[0]";
   };
   internalEvents: {
     "xstate.after(2000)#Outgoing Form.recordCreated": {
@@ -37,12 +39,12 @@ export interface Typegen0 {
       data: unknown;
       __tip: "See the XState TS docs to learn how to strongly type this.";
     };
-    "error.platform.Outgoing Form.updatingRecord:invocation[0]": {
-      type: "error.platform.Outgoing Form.updatingRecord:invocation[0]";
-      data: unknown;
-    };
     "error.platform.Outgoing Form.creatingRecord:invocation[0]": {
       type: "error.platform.Outgoing Form.creatingRecord:invocation[0]";
+      data: unknown;
+    };
+    "error.platform.Outgoing Form.updatingRecord:invocation[0]": {
+      type: "error.platform.Outgoing Form.updatingRecord:invocation[0]";
       data: unknown;
     };
     "xstate.init": { type: "xstate.init" };
