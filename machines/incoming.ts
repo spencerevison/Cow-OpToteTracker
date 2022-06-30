@@ -5,6 +5,7 @@ interface Context {
   alertStatus: string;
   records: any[];
   toteId: string;
+  errorStatus: number;
 }
 
 type Event = {
@@ -12,8 +13,7 @@ type Event = {
   toteId: string;
 };
 
-const isRecordFound = (context) => context.records.length > 0;
-const isRecordNotFound = (context) => context.records.length === 0;
+const isRecordNotFound = (context) => context.errorStatus === 404;
 
 export const incomingFormMachine =
   /** @xstate-layout N4IgpgJg5mDOIC5QHkCuAXKB7AlgOygAIAxLAJwFsA6HCAGzAGIBlAVQCEBZASQBVFQAByywc6HFjwCQAD0QBGAAwAWAMxVFANgBMygKzbt8gOzztBgDQgAnolWrFGxc+VLNq5YuMAOAL6+rNExcAhJyagAzMHQAYwALfCgAJTAY8ghYRghJMBo8ADcsAGtcoOxEsMoqKNiEghS0sgyEfEKYgENxSQBtRQBdaWFRLqkkWQUVdS1dAyNTc20rWwRPR01140V5eVU9FW17f0CMctDSKpr4xIb0zLAyMnIqQTpOiPCqMpCic8joq-qqVuLQKWA6I16AzGQzEElGoDkCHkym8mioxk0eixPkUens5iWiGUaio9ns3i08m8yk0AE5NEcQF8Kr8qKhBBBOtcgU0sjk8oUSp8Tt9KtR2ZzxIDGhAQW0uT1+oMRLDJNJEdpvOpaTqdd59c59d5jISEKptLSqPINl5jA4vMS9IzmWcPhKudL0ox7o8yM9Xuh3lUXT83RyPckebLWmCFXhIcrhnD1YhNdrdbSjYb9SabIhNMptFaNrSvNpjLTzapnSKWR8yFHWOH0JBGDJYOhOrl2hEW2QABTaZyKACUjBDYqoDZlTclkETqvh4wQmm88ioeNLyNM8z0ylN5st1s0m2MducxkdNeCdaqMQbEZuvOyeFyMaFE9Z97Aj6jctjEJKtCKojCmCBplQGaZgaihGrmyzaJojjHie7jGOY7jyNepyhneD5SpGMreg8TwvG8Hyfh836-jK-7gnCCbAUmapjBqWqQRmWawTmpq0uuw6KKoOx6MYejbMotLYaKrLTukADC+Gtu2nYtlQPZ9oOw5jpRVSyU0Ck-i2EALqBrH5muG6qFuyg7mYe6mohyHrKhqjoXomFSbe1DtIIOAAKIkWQbYdl2am9vcmnONptaulUPn+YFJnJmZSIGHo6J2qoq5rkYJjwamSgbsOWVGCoej0v4AQgHgWAQHA0g6dQtAMElLEIogWponiZi4kOuxYg5FLFusxp0poSj6k6VWNdU-x1IRtytUuiJ2WiXiKAc3h6FtqLbaarjrlq9gjdM5r6J5sXis23IyktYGFvtDjDaJDi6OYZ7VtNMW4dQekQLOXbGUxi73capJmGoNKmFtSj5WaBzDWNpaFieKgXT9VDUQRT5A0IIHJe1KzGFQng6A49LyGJ3GaA52wcXq9KmJWXifccN6XVOUYGYDd0pSixNCboHgnlSVNw+YyiI5ie4nliWLo5O8UBb6vOEyYzjotL5UWltNmqKaOiOPSJ6bUJpY+Arvyq8uVKmlSTgCY7zjIpVvhAA */
@@ -28,32 +28,16 @@ export const incomingFormMachine =
         alertStatus: "neutral",
         records: [],
         toteId: "",
+        errorStatus: 0,
       },
       states: {
         idle: {
           entry: "idle",
           on: {
             SUBMIT: {
-              target: "fetchRecord",
+              target: "deletingRecord",
               actions: "submit",
             },
-          },
-        },
-        fetchRecord: {
-          entry: "fetchRecord",
-          invoke: {
-            src: "fetchRecord",
-            onDone: [
-              {
-                target: "deletingRecord",
-                cond: isRecordFound,
-              },
-              {
-                target: "recordNotFound",
-                cond: isRecordNotFound,
-              },
-            ],
-            onError: "apiError",
           },
         },
         recordNotFound: {
@@ -69,7 +53,10 @@ export const incomingFormMachine =
           invoke: {
             src: "deleteRecord",
             onDone: "recordDeleted",
-            onError: "apiError",
+            onError: [
+              { cond: isRecordNotFound, target: "recordNotFound" },
+              { target: "apiError" },
+            ],
           },
         },
         recordDeleted: {
@@ -94,13 +81,10 @@ export const incomingFormMachine =
       actions: {
         submit: (context, event) => {
           context.toteId = event.toteId;
+          context.errorStatus = 0;
         },
         idle: (context) => {
           context.msg = "Enter ID for next tote:";
-          context.alertStatus = NEUTRAL;
-        },
-        fetchRecord: (context) => {
-          context.msg = "Looking for record...";
           context.alertStatus = NEUTRAL;
         },
         recordNotFound: (context) => {
@@ -121,20 +105,13 @@ export const incomingFormMachine =
         },
       },
       services: {
-        fetchRecord: (context) => {
-          return fetch("/.netlify/functions/fetch-record", {
-            method: "POST",
-            body: JSON.stringify({ toteId: context.toteId }),
-          })
-            .then((response) => response.json())
-            .then((data) => (context.records = data.records));
-        },
         deleteRecord: (context) => {
           return fetch("/.netlify/functions/delete-record", {
             method: "POST",
-            body: JSON.stringify({ id: context.records[0].id }),
+            body: JSON.stringify({ toteId: context.toteId }),
           }).then((response) => {
             if (!response.ok) {
+              context.errorStatus = response.status;
               throw Error;
             }
           });

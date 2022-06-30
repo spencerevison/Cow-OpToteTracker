@@ -1,29 +1,38 @@
 import { Handler } from "@netlify/functions";
-import { buildClient } from "@datocms/cma-client-node";
+const contentful = require("contentful-management");
 
-const client = buildClient({
-  apiToken: process.env.DATOCMS_API_TOKEN || "",
+const client = contentful.createClient({
+  accessToken: process.env.CONTENTFUL_API_TOKEN,
 });
 
 export const handler: Handler = async (event) => {
   const { customerName, orderId, toteId } = JSON.parse(event.body);
 
   try {
-    await client.items.create({
-      item_type: {
-        type: "item_type",
-        id: process.env.DATOCMS_TOTE_MODEL_ID || "",
-      },
-      customer_name: customerName,
-      order_id: orderId,
-      tote_id: toteId,
-    });
+    await client
+      .getSpace(process.env.CONTENTFUL_SPACE_ID)
+      .then((space) => space.getEnvironment("master"))
+      .then((environment) =>
+        environment.createEntryWithId("tote", toteId, {
+          fields: {
+            customerName: {
+              "en-US": customerName,
+            },
+            orderId: {
+              "en-US": orderId,
+            },
+            toteId: {
+              "en-US": toteId,
+            },
+          },
+        })
+      );
     return {
       statusCode: 200,
     };
   } catch (error) {
     return {
-      statusCode: error.response.status,
+      statusCode: JSON.parse(error.message).status,
     };
   }
 };
