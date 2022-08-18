@@ -88,19 +88,19 @@ export const incomingFormMachine =
           context.alertStatus = NEUTRAL;
         },
         recordNotFound: (context) => {
-          context.msg = "Record not found.";
+          context.msg = "That tote isn't currently logged out.";
           context.alertStatus = WARNING;
         },
         deletingRecord: (context) => {
-          context.msg = "Deleting record...";
+          context.msg = "Logging in tote...";
           context.alertStatus = NEUTRAL;
         },
         recordDeleted: (context) => {
-          context.msg = "Record has been deleted.";
+          context.msg = "Tote logged in successfully.";
           context.alertStatus = SUCCESS;
         },
         apiError: (context) => {
-          context.msg = "Oops! An error was encountered.";
+          context.msg = "Doh! <insert cryptic error message>";
           context.alertStatus = ERROR;
         },
       },
