@@ -1,2 +1,14 @@
 [build]
   functions = "netlify/functions"
+
+[context.branch-deploy.environment]
+  CONTENTFUL_ENVIRONMENT = "development"
+
+[context.deploy-preview.environment]
+  CONTENTFUL_ENVIRONMENT = "development"
+
+[context.dev.environment]
+  CONTENTFUL_ENVIRONMENT = "development"
+
+[context.production.environment]
+  CONTENTFUL_ENVIRONMENT = "master"
