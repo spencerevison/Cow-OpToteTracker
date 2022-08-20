@@ -1,5 +1,6 @@
 import React, { useEffect, useRef } from "react";
 import { Typeahead } from "react-bootstrap-typeahead";
+React.useLayoutEffect = React.useEffect;
 
 type CustomerNameProps = {
   onChange: any;

@@ -35,7 +35,7 @@
 }
 
 .dropdown-menu {
-  @apply absolute top-0 left-0 max-h-72 !w-auto min-w-[190px] !rounded-md  border-x border-y border-base-content/20 bg-white text-left drop-shadow-lg;
+  @apply absolute top-0 left-0 z-10 max-h-72 !w-auto min-w-[190px] !rounded-md  border-x border-y border-base-content/20 bg-white text-left drop-shadow-lg;
 }
 
 .dropdown-menu .dropdown-item {

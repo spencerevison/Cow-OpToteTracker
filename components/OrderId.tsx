@@ -28,7 +28,8 @@ const OrderId: React.FC<OrderIdProps> = ({ register, errors }) => {
               message: "Order ID must only contain numbers.",
             },
           })}
-          type="text"
+          type="tel"
+          max="99999"
           maxLength={5}
           placeholder="xxxxx"
           className={`input input-bordered ${

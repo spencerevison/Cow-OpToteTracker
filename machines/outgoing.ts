@@ -99,7 +99,6 @@ export const outgoingFormMachine =
           context.isDuplicate = false;
         },
         idle: (context) => {
-          console.log("idle");
           context.msg = "Enter info for next tote:";
           context.alertStatus = NEUTRAL;
         },

@@ -93,11 +93,7 @@ const OutgoingForm = () => {
           name="customerName"
           defaultValue=""
           render={({ field: { onChange } }) => (
-            <CustomerName
-              onChange={onChange}
-              names={names}
-              resetCount={resetCount}
-            />
+            <CustomerName {...{ onChange, names, resetCount }} />
           )}
         />
         <OrderId {...{ register, errors }} />

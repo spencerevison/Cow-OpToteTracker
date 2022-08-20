@@ -28,7 +28,8 @@ const ToteId: React.FC<ToteIdProps> = ({ register, errors }) => {
               message: "Tote ID must only contain numbers.",
             },
           })}
-          type="text"
+          type="tel"
+          max="9999"
           maxLength={4}
           placeholder="xxxx"
           className={`input input-bordered ${
