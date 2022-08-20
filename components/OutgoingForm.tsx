@@ -13,6 +13,8 @@ interface FormInputs {
   toteId: string;
 }
 
+console.log(process.env.CONTENTFUL_ENVIRONMENT);
+
 const OutgoingForm = () => {
   // Get names for autocomplete
   const [names, setNames] = useState([]);
