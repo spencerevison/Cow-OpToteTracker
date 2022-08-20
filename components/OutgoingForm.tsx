@@ -20,7 +20,11 @@ const OutgoingForm = () => {
     fetch("/.netlify/functions/get-names")
       .then((response) => response.json())
       .then((data) => {
-        setNames(data.names);
+        setNames(
+          data.names.sort((a, b) =>
+            a.localeCompare(b, "en", { sensitivity: "base" })
+          )
+        );
       });
   }, []);
 
@@ -65,7 +69,11 @@ const OutgoingForm = () => {
     if (!names.includes(customerName)) {
       const newNames = [...names];
       newNames.push(customerName);
-      setNames(newNames);
+      setNames(
+        newNames.sort((a, b) =>
+          a.localeCompare(b, "en", { sensitivity: "base" })
+        )
+      );
     }
 
     send({
