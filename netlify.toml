@@ -2,8 +2,7 @@
   functions = "netlify/functions"
 
 [context.branch-deploy]
-  [context.branch-deploy.environment]
-    CONTENTFUL_ENVIRONMENT = "development"
+  environment = { CONTENTFUL_ENVIRONMENT = "development" }
 
 [context.deploy-preview]
   [context.deploy-preview.environment]
