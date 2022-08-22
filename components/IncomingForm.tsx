@@ -48,8 +48,8 @@ const IncomingForm = () => {
   const showProgress = ["fetchRecord", "deletingRecord"].some(state.matches);
 
   return (
-    <div className="text-center">
-      <h1 className="text-2xl">Log Incoming Totes</h1>
+    <>
+      <h1 className="text-xl sm:text-2xl">Log Incoming Totes</h1>
       <progress
         className={`progress mx-auto my-1 block w-56 md:my-4 ${
           !showProgress && "opacity-0"
@@ -95,7 +95,7 @@ const IncomingForm = () => {
           />
         )}
       </form>
-    </div>
+    </>
   );
 };
 export default IncomingForm;

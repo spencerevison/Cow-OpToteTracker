@@ -31,7 +31,9 @@ const NavBar = () => {
           <NavLinks className="dropdown-content menu rounded-box menu-compact mt-3 w-52 bg-base-100 p-2 shadow" />
         </div>
         <Link href="/">
-          <a className="text-3xl normal-case">Cow-Op Tote Tracker</a>
+          <a className="text-2xl normal-case sm:text-3xl">
+            Cow-Op Tote Tracker
+          </a>
         </Link>
       </div>
       <div className="navbar-center hidden lg:flex">

@@ -24,7 +24,7 @@ const Alert: React.FC<AlertProps> = ({ msg, status }) => {
       ${status === ERROR && "alert-error"}
     `}
     >
-      <div>
+      <div className="mr-auto">
         {status === NEUTRAL && <NeutralIcon />}
         {status === WARNING && <WarningIcon />}
         {status === SUCCESS && <SuccessIcon />}

@@ -22,7 +22,7 @@ const CustomerName: React.FC<CustomerNameProps> = (props) => {
 
   return (
     <label className="input-group my-4 justify-center">
-      <span className="w-40">Customer Name</span>
+      <span className="w-40 leading-tight">Customer Name</span>
       <Typeahead
         ref={typeaheadRef}
         allowNew

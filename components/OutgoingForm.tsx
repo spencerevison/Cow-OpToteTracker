@@ -87,8 +87,8 @@ const OutgoingForm = () => {
   const showProgress = ["updatingRecord", "creatingRecord"].some(state.matches);
 
   return (
-    <div className="text-center">
-      <h1 className="text-2xl">Log Outgoing Totes</h1>
+    <>
+      <h1 className="text-xl sm:text-2xl">Log Outgoing Totes</h1>
       <progress
         className={`progress mx-auto my-1 block w-56 md:my-4 ${
           !showProgress && "opacity-0"
@@ -108,7 +108,7 @@ const OutgoingForm = () => {
         <ToteId {...{ register, errors }} />
         <button className="btn my-4">Log Outgoing Tote</button>
       </form>
-    </div>
+    </>
   );
 };
 export default OutgoingForm;
