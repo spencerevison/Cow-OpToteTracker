@@ -6,6 +6,12 @@ type NavLinksProps = {
   className: string;
 };
 
+const clickHandler = () => {
+  if (document.activeElement instanceof HTMLElement) {
+    document.activeElement.blur();
+  }
+};
+
 const NavLinks: React.FC<NavLinksProps> = ({ className }) => {
   const router = useRouter();
 
@@ -14,6 +20,7 @@ const NavLinks: React.FC<NavLinksProps> = ({ className }) => {
       <li className="mr-4">
         <Link href="/outgoing">
           <a
+            onClick={clickHandler}
             className={`
               ${router.pathname == "/outgoing" ? "underline" : ""}
             `}
@@ -25,6 +32,7 @@ const NavLinks: React.FC<NavLinksProps> = ({ className }) => {
       <li>
         <Link href="/incoming">
           <a
+            onClick={clickHandler}
             className={`
               ${router.pathname == "/incoming" ? "underline" : ""}
             `}
