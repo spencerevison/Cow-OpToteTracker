@@ -63,6 +63,7 @@ const IncomingForm = () => {
           <button
             className="btn flex-auto gap-2"
             onClick={() => setUseCam(!useCam)}
+            type="button"
           >
             {useCam ? (
               <>
@@ -83,6 +84,7 @@ const IncomingForm = () => {
           <QrReader
             constraints={{ facingMode: "environment" }}
             onResult={(result) => {
+              console.log(result);
               if (!!result) {
                 setValue("toteId", result.getText());
                 setQrData(result.getText());
