@@ -1,6 +1,10 @@
 import type { NextPage } from "next";
+import dynamic from "next/dynamic";
+import { Suspense } from "react";
 import Head from "next/head";
-import IncomingForm from "../components/IncomingForm";
+const IncomingForm = dynamic(() => import("../components/IncomingForm"), {
+  suspense: true,
+});
 
 const Incoming: NextPage = () => {
   return (
@@ -8,7 +12,9 @@ const Incoming: NextPage = () => {
       <Head>
         <title>Log Incoming Totes | Cow-Op Tote Tracker</title>
       </Head>
-      <IncomingForm />
+      <Suspense fallback={`Loading...`}>
+        <IncomingForm />
+      </Suspense>
     </>
   );
 };

@@ -1,16 +1,22 @@
 import type { NextPage } from "next";
+import dynamic from "next/dynamic";
+import { Suspense } from "react";
 import Head from "next/head";
-import OutgoingForm from "../components/OutgoingForm";
+const OutgoingForm = dynamic(() => import("../components/OutgoingForm"), {
+  suspense: true,
+});
 
-const Home: NextPage = () => {
+const Outgoing: NextPage = () => {
   return (
     <>
       <Head>
         <title>Log Outgoing Totes | Cow-Op Tote Tracker</title>
       </Head>
-      <OutgoingForm />
+      <Suspense fallback={`Loading...`}>
+        <OutgoingForm />
+      </Suspense>
     </>
   );
 };
 
-export default Home;
+export default Outgoing;
