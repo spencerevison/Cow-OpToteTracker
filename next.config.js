@@ -1,10 +1,15 @@
 /** @type {import('next').NextConfig} */
+const withPWA = require("next-pwa");
+
 const nextConfig = {
   experimental: { optimizeCss: true },
   reactStrictMode: true,
   i18n: {
     locales: ["en"],
     defaultLocale: "en",
+  },
+  pwa: {
+    dest: "public",
   },
   webpack(config) {
     config.module.rules.push({
@@ -16,4 +21,4 @@ const nextConfig = {
   },
 };
 
-module.exports = nextConfig;
+module.exports = withPWA(nextConfig);
