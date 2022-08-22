@@ -12,14 +12,14 @@ export interface Typegen0 {
       type: "error.platform.Incoming Form.deletingRecord:invocation[0]";
       data: unknown;
     };
-    "xstate.after(2000)#Incoming Form.apiError": {
-      type: "xstate.after(2000)#Incoming Form.apiError";
+    "xstate.after(5000)#Incoming Form.apiError": {
+      type: "xstate.after(5000)#Incoming Form.apiError";
     };
-    "xstate.after(2000)#Incoming Form.recordDeleted": {
-      type: "xstate.after(2000)#Incoming Form.recordDeleted";
+    "xstate.after(5000)#Incoming Form.recordDeleted": {
+      type: "xstate.after(5000)#Incoming Form.recordDeleted";
     };
-    "xstate.after(2000)#Incoming Form.recordNotFound": {
-      type: "xstate.after(2000)#Incoming Form.recordNotFound";
+    "xstate.after(5000)#Incoming Form.recordNotFound": {
+      type: "xstate.after(5000)#Incoming Form.recordNotFound";
     };
     "xstate.init": { type: "xstate.init" };
   };
@@ -36,9 +36,9 @@ export interface Typegen0 {
     apiError: "error.platform.Incoming Form.deletingRecord:invocation[0]";
     deletingRecord: "SUBMIT";
     idle:
-      | "xstate.after(2000)#Incoming Form.apiError"
-      | "xstate.after(2000)#Incoming Form.recordDeleted"
-      | "xstate.after(2000)#Incoming Form.recordNotFound"
+      | "xstate.after(5000)#Incoming Form.apiError"
+      | "xstate.after(5000)#Incoming Form.recordDeleted"
+      | "xstate.after(5000)#Incoming Form.recordNotFound"
       | "xstate.init";
     recordDeleted: "done.invoke.Incoming Form.deletingRecord:invocation[0]";
     recordNotFound: "error.platform.Incoming Form.deletingRecord:invocation[0]";

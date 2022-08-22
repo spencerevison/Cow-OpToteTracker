@@ -43,7 +43,7 @@ export const incomingFormMachine =
         recordNotFound: {
           entry: "recordNotFound",
           after: {
-            "2000": {
+            "5000": {
               target: "idle",
             },
           },
@@ -62,7 +62,7 @@ export const incomingFormMachine =
         recordDeleted: {
           entry: ["resetForm", "recordDeleted"],
           after: {
-            "2000": {
+            "5000": {
               target: "idle",
             },
           },
@@ -70,7 +70,7 @@ export const incomingFormMachine =
         apiError: {
           entry: "apiError",
           after: {
-            "2000": {
+            "5000": {
               target: "idle",
             },
           },

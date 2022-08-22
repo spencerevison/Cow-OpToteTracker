@@ -17,7 +17,7 @@ type AlertProps = {
 const Alert: React.FC<AlertProps> = ({ msg, status }) => {
   return (
     <div
-      className={`alert mx-auto mb-6 max-w-[350px] ease-in
+      className={`alert mx-auto mb-4 max-w-[350px] ease-in md:mb-6
       ${status === NEUTRAL && "opacity-"}
       ${status === WARNING && "alert-warning"}
       ${status === SUCCESS && "alert-success"}

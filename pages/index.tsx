@@ -18,7 +18,7 @@ const Home: NextPage = () => {
       <header>
         <NavBar />
       </header>
-      <main className="my-8 mx-4 text-center sm:mx-8 md:mx-12">
+      <main className="my-1 mx-4 text-center sm:mx-8 md:mx-12 md:my-8">
         <h1 className="text-2xl">Start Tracking Totes!</h1>
         <div className="mx-auto flex max-w-xs flex-col">
           <Link href="/outgoing">

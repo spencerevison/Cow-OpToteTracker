@@ -18,7 +18,7 @@ const Home: NextPage = () => {
       <header>
         <NavBar />
       </header>
-      <main className="my-8 mx-4 sm:mx-8 md:mx-12">
+      <main className="my-1 mx-4 sm:mx-8 md:mx-12 md:my-8">
         <IncomingForm />
       </main>
     </>

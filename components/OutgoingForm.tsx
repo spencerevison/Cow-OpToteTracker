@@ -90,7 +90,7 @@ const OutgoingForm = () => {
     <div className="text-center">
       <h1 className="text-2xl">Log Outgoing Totes</h1>
       <progress
-        className={`progress mx-auto my-4 block w-56 ${
+        className={`progress mx-auto my-1 block w-56 md:my-4 ${
           !showProgress && "opacity-0"
         }`}
       ></progress>
