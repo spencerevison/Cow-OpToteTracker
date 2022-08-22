@@ -8,6 +8,12 @@
   "orientation": "portrait-primary",
   "icons": [
     {
+      "src": "/maskable_icon.png",
+      "sizes": "200x200",
+      "type": "image/png",
+      "purpose": "maskable"
+    },
+    {
       "src": "windows11/SmallTile.scale-100.png",
       "sizes": "71x71"
     },
