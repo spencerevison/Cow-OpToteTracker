@@ -7,7 +7,12 @@ const NavBar = () => {
     <div className="navbar bg-base-100 pt-4 sm:px-4 md:px-8">
       <div className="flex-1">
         <div className="dropdown">
-          <label tabIndex={0} className="btn btn-ghost lg:hidden">
+          <label
+            tabIndex={0}
+            className="btn btn-ghost lg:hidden"
+            aria-label="Navigation"
+          >
+            <span className="hidden">Navigation</span>
             <svg
               xmlns="http://www.w3.org/2000/svg"
               className="h-5 w-5"

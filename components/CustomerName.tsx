@@ -27,7 +27,6 @@ const CustomerName: React.FC<CustomerNameProps> = (props) => {
         ref={typeaheadRef}
         allowNew
         id="customerName"
-        labelKey="customerName"
         options={names}
         placeholder="Kalaukus, Kah"
         onChange={onChange}
