@@ -10,6 +10,7 @@
   },
   "dependencies": {
     "@datocms/cma-client-node": "^1.0.0",
+    "@ericblade/quagga2": "^1.7.1",
     "@hookform/error-message": "^2.0.0",
     "@netlify/functions": "^1.0.0",
     "@svgr/webpack": "^6.2.1",
@@ -24,7 +25,6 @@
     "react-dom": "18.2.0",
     "react-hook-form": "^7.32.2",
     "react-icons": "^4.4.0",
-    "react-qr-reader": "^3.0.0-beta-1",
     "xstate": "^4.32.1"
   },
   "devDependencies": {

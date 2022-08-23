@@ -50,6 +50,19 @@
   @apply rounded-none bg-transparent font-bold;
 }
 
+/* Barcode Scanner */
+.scanner {
+  @apply grid;
+}
+
+.scanner video {
+  @apply col-start-1 row-start-1 h-full w-full;
+}
+
+.scanner canvas {
+  @apply col-start-1 row-start-1 h-full w-full;
+}
+
 /* Alert Icon */
 .input-error-msg::before {
   display: inline;

@@ -1,13 +1,12 @@
-import React, { useState } from "react";
+import React, { useState, useRef } from "react";
 import { useForm, SubmitHandler } from "react-hook-form";
-import { QrReader } from "react-qr-reader";
 import { useMachine } from "@xstate/react";
-import { FaCamera } from "react-icons/fa";
 import ToteId from "./ToteId";
 import Alert from "./Alert";
 import { incomingFormMachine } from "../machines/incoming";
 import Camera from "../assets/svg/camera.svg";
 import CameraSlash from "../assets/svg/camera-slash.svg";
+import Scanner from "./Scanner";
 
 interface FormInputs {
   customerName: string;
@@ -18,6 +17,7 @@ interface FormInputs {
 const IncomingForm = () => {
   const [qrData, setQrData] = useState("");
   const [useCam, setUseCam] = useState(false);
+  const scannerRef = useRef(null);
 
   const {
     register,
@@ -81,18 +81,21 @@ const IncomingForm = () => {
         </div>
 
         {useCam && (
-          <QrReader
-            constraints={{ facingMode: "environment" }}
-            onResult={(result) => {
-              console.log(result);
-              if (!!result) {
-                setValue("toteId", result.getText());
-                setQrData(result.getText());
-                handleSubmit(onSubmit)();
-              }
-            }}
-            className="mx-auto w-full max-w-lg"
-          />
+          <div
+            ref={scannerRef}
+            className="scanner mx-auto h-auto w-full max-w-lg"
+          >
+            <Scanner
+              scannerRef={scannerRef}
+              onDetected={(result) => {
+                if (result) {
+                  setValue("toteId", result);
+                  setQrData(result);
+                  handleSubmit(onSubmit)();
+                }
+              }}
+            />
+          </div>
         )}
       </form>
     </>
