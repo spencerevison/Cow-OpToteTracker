@@ -56,7 +56,7 @@
 }
 
 .scanner video {
-  @apply col-start-1 row-start-1 h-full w-full;
+  @apply z-10 col-start-1 row-start-1 h-full w-full;
 }
 
 .scanner canvas {

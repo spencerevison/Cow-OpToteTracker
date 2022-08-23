@@ -1,4 +1,4 @@
-import React, { useState, useRef } from "react";
+import React, { useState, useRef, useEffect } from "react";
 import { useForm, SubmitHandler } from "react-hook-form";
 import { useMachine } from "@xstate/react";
 import ToteId from "./ToteId";
@@ -38,7 +38,6 @@ const IncomingForm = () => {
   });
 
   const onSubmit: SubmitHandler<FormInputs> = async (data) => {
-    console.log(data.toteId);
     send({
       type: "SUBMIT",
       toteId: data.toteId,
@@ -46,6 +45,8 @@ const IncomingForm = () => {
   };
 
   const showProgress = ["fetchRecord", "deletingRecord"].some(state.matches);
+
+  useEffect(() => {}, [useCam]);
 
   return (
     <>
@@ -95,6 +96,7 @@ const IncomingForm = () => {
                 }
               }}
             />
+            <div className="btn loading btn-square col-start-1 row-start-1 mx-auto my-auto rounded-full"></div>
           </div>
         )}
       </form>
