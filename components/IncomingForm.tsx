@@ -73,7 +73,7 @@ const IncomingForm = () => {
             ) : (
               <>
                 <Camera className="h-8 w-8" />
-                Scan Barcode
+                Scan Barcodes
               </>
             )}
           </button>
