@@ -6,61 +6,66 @@ type ScannerProps = {
 };
 
 class Scanner extends React.Component<ScannerProps> {
+  private running = false;
+
   componentDidMount() {
-    Quagga.init(
-      {
-        inputStream: {
-          type: "LiveStream",
-          constraints: {
-            facingMode: "environment",
-          },
-        },
-        frequency: 10,
-        multiple: false,
-        debug: {
-          drawBoundingBox: true,
-          showFrequency: true,
-          drawScanline: true,
-          showPattern: true,
-        },
-        locator: {
-          halfSample: true,
-          patchSize: "large", // x-small, small, medium, large, x-large
-          debug: {
-            showCanvas: true,
-            showPatches: false,
-            showFoundPatches: false,
-            showSkeleton: false,
-            showLabels: false,
-            showPatchLabels: false,
-            showRemainingPatchLabels: false,
-            boxFromPatches: {
-              showTransformed: false,
-              showTransformedBox: false,
-              showBB: false,
+    if (!this.running) {
+      Quagga.init(
+        {
+          inputStream: {
+            type: "LiveStream",
+            constraints: {
+              facingMode: "environment",
             },
           },
-        },
-        numOfWorkers: 4,
-        decoder: {
-          readers: ["code_128_reader"],
+          frequency: 10,
+          multiple: false,
           debug: {
-            drawBoundingBox: false,
-            showFrequency: false,
-            drawScanline: false,
-            showPattern: false,
+            drawBoundingBox: true,
+            showFrequency: true,
+            drawScanline: true,
+            showPattern: true,
           },
+          locator: {
+            halfSample: true,
+            patchSize: "large", // x-small, small, medium, large, x-large
+            debug: {
+              showCanvas: true,
+              showPatches: false,
+              showFoundPatches: false,
+              showSkeleton: false,
+              showLabels: false,
+              showPatchLabels: false,
+              showRemainingPatchLabels: false,
+              boxFromPatches: {
+                showTransformed: false,
+                showTransformedBox: false,
+                showBB: false,
+              },
+            },
+          },
+          numOfWorkers: 4,
+          decoder: {
+            readers: ["code_128_reader"],
+            debug: {
+              drawBoundingBox: false,
+              showFrequency: false,
+              drawScanline: false,
+              showPattern: false,
+            },
+          },
+          locate: true,
         },
-        locate: true,
-      },
-      function (err) {
-        if (err) {
-          return console.log(err);
+        function (err) {
+          if (err) {
+            return console.log(err);
+          }
+          Quagga.start();
         }
-        Quagga.start();
-      }
-    );
-    Quagga.onDetected(this._onDetected);
+      );
+      Quagga.onDetected(this._onDetected);
+      this.running = true;
+    }
   }
 
   componentWillUnmount() {
