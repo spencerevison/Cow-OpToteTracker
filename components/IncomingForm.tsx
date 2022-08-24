@@ -1,4 +1,4 @@
-import React, { useState, useRef, useEffect } from "react";
+import React, { useState, useRef } from "react";
 import { useForm, SubmitHandler } from "react-hook-form";
 import { useMachine } from "@xstate/react";
 import ToteId from "./ToteId";
@@ -46,8 +46,6 @@ const IncomingForm = () => {
 
   const showProgress = ["fetchRecord", "deletingRecord"].some(state.matches);
 
-  useEffect(() => {}, [useCam]);
-
   return (
     <>
       <h1 className="text-xl sm:text-2xl">Log Incoming Totes</h1>
@@ -87,11 +85,10 @@ const IncomingForm = () => {
             className="scanner mx-auto h-auto w-full max-w-lg"
           >
             <Scanner
-              scannerRef={scannerRef}
               onDetected={(result) => {
                 if (result) {
-                  setValue("toteId", result);
-                  setQrData(result);
+                  setValue("toteId", result.codeResult.code);
+                  setQrData(result.codeResult.code);
                   handleSubmit(onSubmit)();
                 }
               }}

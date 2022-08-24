@@ -60,7 +60,19 @@
 }
 
 .scanner canvas {
-  @apply col-start-1 row-start-1 h-full w-full;
+  @apply z-20 col-start-1 row-start-1 h-full w-full;
+}
+
+.scanner br {
+  @apply hidden;
+}
+
+.viewport {
+  @apply relative;
+}
+
+.viewport canvas {
+  @apply absolute top-0 left-0;
 }
 
 /* Alert Icon */
