@@ -93,7 +93,7 @@ const IncomingForm = () => {
                 }
               }}
             />
-            <div className="btn loading btn-square col-start-1 row-start-1 mx-auto my-auto rounded-full"></div>
+            <div className="btn loading btn-square col-start-1 row-start-1 mx-auto my-auto rounded-full border-none bg-transparent text-neutral before:!h-8 before:!w-8 before:!border-4 before:!border-x-neutral"></div>
           </div>
         )}
       </form>
