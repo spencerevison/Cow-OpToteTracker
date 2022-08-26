@@ -1,4 +1,4 @@
-import React, { useRef, useEffect } from "react";
+import React, { useEffect } from "react";
 import { ErrorMessage } from "@hookform/error-message";
 import { FieldErrors } from "../types/hookForms";
 
@@ -9,7 +9,7 @@ type ToteIdProps = {
 };
 
 const ToteId: React.FC<ToteIdProps> = ({ register, errors, qrData }) => {
-  const { onChange, onBlur, name, ref } = register("toteId", {
+  const { ref } = register("toteId", {
     required: "Tote ID is required.",
     minLength: {
       value: 4,
@@ -26,12 +26,11 @@ const ToteId: React.FC<ToteIdProps> = ({ register, errors, qrData }) => {
   });
 
   // Manually set input value if QR scanner is used
-  const inputRef = useRef(ref);
   useEffect(() => {
-    if (qrData && qrData !== "") {
-      inputRef.current.value = qrData;
+    if (qrData && qrData !== "" && ref.current) {
+      ref.current.value = qrData;
     }
-  }, [qrData, inputRef]);
+  }, [qrData, ref]);
 
   return (
     <>
@@ -55,10 +54,6 @@ const ToteId: React.FC<ToteIdProps> = ({ register, errors, qrData }) => {
           })}
           type="tel"
           max="9999"
-          onChange={onChange}
-          onBlur={onBlur}
-          name={name}
-          ref={inputRef}
           maxLength={4}
           placeholder="xxxx"
           className={`input input-bordered ${

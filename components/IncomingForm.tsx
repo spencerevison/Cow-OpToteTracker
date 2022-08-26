@@ -1,4 +1,4 @@
-import React, { useState, useRef } from "react";
+import React, { useState } from "react";
 import { useForm, SubmitHandler } from "react-hook-form";
 import { useMachine } from "@xstate/react";
 import ToteId from "./ToteId";
@@ -17,7 +17,6 @@ interface FormInputs {
 const IncomingForm = () => {
   const [qrData, setQrData] = useState("");
   const [useCam, setUseCam] = useState(false);
-  const scannerRef = useRef(null);
 
   const {
     register,
@@ -57,7 +56,6 @@ const IncomingForm = () => {
       <Alert msg={state.context.msg} status={state.context.alertStatus} />
       <form onSubmit={handleSubmit(onSubmit)}>
         <ToteId {...{ register, errors, qrData }} />
-
         <div className="mx-auto my-4 flex max-w-[350px] flex-wrap items-center justify-center gap-4 gap-y-4">
           <button
             className="btn flex-auto gap-2"
@@ -79,23 +77,16 @@ const IncomingForm = () => {
           <button className="btn flex-auto gap-2">Log Tote</button>
         </div>
 
-        {useCam && (
-          <div
-            ref={scannerRef}
-            className="scanner mx-auto h-auto w-full max-w-lg"
-          >
-            <Scanner
-              onDetected={(result) => {
-                if (result) {
-                  setValue("toteId", result.codeResult.code);
-                  setQrData(result.codeResult.code);
-                  handleSubmit(onSubmit)();
-                }
-              }}
-            />
-            <div className="btn loading btn-square col-start-1 row-start-1 mx-auto my-auto rounded-full border-none bg-transparent text-neutral before:!h-8 before:!w-8 before:!border-4 before:!border-x-neutral"></div>
-          </div>
-        )}
+        <Scanner
+          active={useCam}
+          onDetected={(result) => {
+            if (result) {
+              setValue("toteId", result.codeResult.code);
+              setQrData(result.codeResult.code);
+              handleSubmit(onSubmit)();
+            }
+          }}
+        />
       </form>
     </>
   );

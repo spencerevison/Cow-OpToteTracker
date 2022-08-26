@@ -3,7 +3,7 @@ const withPWA = require("next-pwa");
 
 const nextConfig = {
   experimental: { optimizeCss: true },
-  reactStrictMode: true,
+  reactStrictMode: false,
   i18n: {
     locales: ["en"],
     defaultLocale: "en",

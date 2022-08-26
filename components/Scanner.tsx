@@ -1,15 +1,47 @@
-import React from "react";
+import React, {
+  useEffect,
+  useLayoutEffect,
+  useCallback,
+  useState,
+} from "react";
 import Quagga from "quagga";
 
 type ScannerProps = {
+  active: boolean;
   onDetected: (result: any) => void;
 };
 
-class Scanner extends React.Component<ScannerProps> {
-  private running = false;
+const Scanner: React.FC<ScannerProps> = (props) => {
+  const { onDetected, active } = props;
 
-  componentDidMount() {
-    if (!this.running) {
+  const drawBoxOverlay = useCallback((result) => {
+    const drawingCtx = Quagga.canvas.ctx.overlay;
+    const drawingCanvas = Quagga.canvas.dom.overlay;
+    if (result) {
+      if (result.box) {
+        clearDrawing(drawingCtx, drawingCanvas);
+        Quagga.ImageDebug.drawPath(result.box, { x: 0, y: 1 }, drawingCtx, {
+          color: "purple",
+          lineWidth: 8,
+        });
+        setTimeout(() => {
+          clearDrawing(drawingCtx, drawingCanvas);
+        }, 2000);
+      }
+    }
+  }, []);
+
+  const handleDetected = useCallback(
+    (result) => {
+      drawBoxOverlay(result);
+      onDetected(result);
+    },
+    [onDetected, drawBoxOverlay]
+  );
+
+  useEffect(() => {
+    if (active) {
+      console.log("on");
       Quagga.init(
         {
           inputStream: {
@@ -63,17 +95,17 @@ class Scanner extends React.Component<ScannerProps> {
           Quagga.start();
         }
       );
-      Quagga.onDetected(this._onDetected);
-      this.running = true;
+
+      Quagga.onDetected(handleDetected);
+    } else {
+      try {
+        Quagga.stop();
+        Quagga.offDetected(handleDetected);
+      } catch (e) {}
     }
-  }
+  }, [active]);
 
-  componentWillUnmount() {
-    Quagga.stop();
-    Quagga.offDetected(this._onDetected);
-  }
-
-  clearDrawing = (drawingCtx, drawingCanvas) => {
+  const clearDrawing = (drawingCtx, drawingCanvas) => {
     drawingCtx.clearRect(
       0,
       0,
@@ -82,35 +114,20 @@ class Scanner extends React.Component<ScannerProps> {
     );
   };
 
-  _onDetected = (result) => {
-    this.props.onDetected(result);
-
-    const drawingCtx = Quagga.canvas.ctx.overlay;
-    const drawingCanvas = Quagga.canvas.dom.overlay;
-    if (result) {
-      if (result.box) {
-        this.clearDrawing(drawingCtx, drawingCanvas);
-        Quagga.ImageDebug.drawPath(result.box, { x: 0, y: 1 }, drawingCtx, {
-          color: "purple",
-          lineWidth: 8,
-        });
-        setTimeout(() => {
-          this.clearDrawing(drawingCtx, drawingCanvas);
-        }, 2000);
-      }
-    }
-  };
-
-  render() {
-    return (
+  return (
+    <div
+      className={`scanner mx-auto h-auto w-full max-w-lg ${
+        !active && "!hidden"
+      }`}
+    >
       <div
         id="interactive"
         className="viewport scanner z-10 col-start-1 row-start-1 h-full w-full"
       >
         <video id="quagga-stream"></video>
       </div>
-    );
-  }
-}
-
+      <div className="btn loading btn-square col-start-1 row-start-1 mx-auto my-auto rounded-full border-none bg-transparent text-neutral before:!h-8 before:!w-8 before:!border-4 before:!border-x-neutral"></div>
+    </div>
+  );
+};
 export default Scanner;
