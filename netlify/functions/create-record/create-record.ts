@@ -11,21 +11,23 @@ export const handler: Handler = async (event) => {
   try {
     await client
       .getSpace(process.env.CONTENTFUL_SPACE_ID)
-      .then((space) => space.getEnvironment("master"))
-      .then((environment) =>
-        environment.createEntryWithId("tote", toteId, {
-          fields: {
-            customerName: {
-              "en-US": customerName,
+      .then((space) => space.getEnvironment(process.env.CONTENTFUL_ENVIRONMENT))
+      .then(
+        (environment) =>
+          environment.createEntryWithId("tote", toteId, {
+            fields: {
+              customerName: {
+                "en-US": customerName,
+              },
+              orderId: {
+                "en-US": orderId,
+              },
+              toteId: {
+                "en-US": toteId,
+              },
             },
-            orderId: {
-              "en-US": orderId,
-            },
-            toteId: {
-              "en-US": toteId,
-            },
-          },
-        })
+          })
+        //.then((entry) => entry.publish())
       );
     return {
       statusCode: 200,

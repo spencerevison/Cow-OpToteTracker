@@ -1,9 +1,12 @@
-import React from "react";
+import React, { useState, useRef } from "react";
 import { useForm, SubmitHandler } from "react-hook-form";
 import { useMachine } from "@xstate/react";
 import ToteId from "./ToteId";
 import Alert from "./Alert";
 import { incomingFormMachine } from "../machines/incoming";
+import Camera from "../assets/svg/camera.svg";
+import CameraSlash from "../assets/svg/camera-slash.svg";
+import Scanner from "./Scanner";
 
 interface FormInputs {
   customerName: string;
@@ -12,10 +15,15 @@ interface FormInputs {
 }
 
 const IncomingForm = () => {
+  const [qrData, setQrData] = useState("");
+  const [useCam, setUseCam] = useState(false);
+  const scannerRef = useRef(null);
+
   const {
     register,
     reset,
     handleSubmit,
+    setValue,
     formState: { errors },
   } = useForm<FormInputs>({
     criteriaMode: "all",
@@ -39,19 +47,57 @@ const IncomingForm = () => {
   const showProgress = ["fetchRecord", "deletingRecord"].some(state.matches);
 
   return (
-    <div className="text-center">
-      <h1 className="text-2xl">Log Incoming Totes</h1>
+    <>
+      <h1 className="text-xl sm:text-2xl">Log Incoming Totes</h1>
       <progress
-        className={`progress mx-auto my-4 block w-56 ${
+        className={`progress mx-auto my-1 block w-56 md:my-4 ${
           !showProgress && "opacity-0"
         }`}
       ></progress>
       <Alert msg={state.context.msg} status={state.context.alertStatus} />
       <form onSubmit={handleSubmit(onSubmit)}>
-        <ToteId {...{ register, errors }} />
-        <button className="btn my-4">Log Incoming Tote</button>
+        <ToteId {...{ register, errors, qrData }} />
+
+        <div className="mx-auto my-4 flex max-w-[350px] flex-wrap items-center justify-center gap-4 gap-y-4">
+          <button
+            className="btn flex-auto gap-2"
+            onClick={() => setUseCam(!useCam)}
+            type="button"
+          >
+            {useCam ? (
+              <>
+                <CameraSlash className="h-8 w-8" />
+                Stop Scanning
+              </>
+            ) : (
+              <>
+                <Camera className="h-8 w-8" />
+                Scan Barcodes
+              </>
+            )}
+          </button>
+          <button className="btn flex-auto gap-2">Log Tote</button>
+        </div>
+
+        {useCam && (
+          <div
+            ref={scannerRef}
+            className="scanner mx-auto h-auto w-full max-w-lg"
+          >
+            <Scanner
+              onDetected={(result) => {
+                if (result) {
+                  setValue("toteId", result.codeResult.code);
+                  setQrData(result.codeResult.code);
+                  handleSubmit(onSubmit)();
+                }
+              }}
+            />
+            <div className="btn loading btn-square col-start-1 row-start-1 mx-auto my-auto rounded-full border-none bg-transparent text-neutral before:!h-8 before:!w-8 before:!border-4 before:!border-x-neutral"></div>
+          </div>
+        )}
       </form>
-    </div>
+    </>
   );
 };
 export default IncomingForm;

@@ -1,19 +1,38 @@
-import React from "react";
+import React, { useEffect, useRef } from "react";
+import { Typeahead } from "react-bootstrap-typeahead";
+React.useLayoutEffect = React.useEffect;
 
 type CustomerNameProps = {
-  register: any;
+  onChange: any;
+  resetCount: any;
+  names: string[];
 };
 
 const CustomerName: React.FC<CustomerNameProps> = (props) => {
-  const { register } = props;
+  const { onChange, names, resetCount } = props;
+
+  // When resetCount gets incremented by parent, clear field and set focus
+  const typeaheadRef = useRef(null);
+  useEffect(() => {
+    if (resetCount !== 0) {
+      typeaheadRef.current.clear();
+      typeaheadRef.current.focus();
+    }
+  }, [resetCount]);
+
   return (
     <label className="input-group my-4 justify-center">
-      <span className="w-40">Customer Name</span>
-      <input
-        {...register("customerName")}
-        type="text"
-        placeholder="Kah Kalaukus"
-        className="input input-bordered"
+      <span className="w-40 leading-tight">Customer Name</span>
+      <Typeahead
+        ref={typeaheadRef}
+        allowNew
+        id="customerName"
+        options={names}
+        placeholder="Kalaukus, Kah"
+        onChange={onChange}
+        onInputChange={onChange}
+        className="typeahead"
+        newSelectionPrefix="New customer name: "
       />
     </label>
   );

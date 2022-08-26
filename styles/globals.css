@@ -2,6 +2,80 @@
 @tailwind components;
 @tailwind utilities;
 
+/* Component Overrides */
+@layer components {
+  .input {
+    @apply bg-white;
+  }
+
+  .input:focus {
+    @apply outline-offset-[-4px];
+  }
+
+  .input-group :first-child {
+    @apply rounded-tl-lg rounded-bl-lg;
+  }
+
+  .input-group :last-child {
+    @apply rounded-tr-lg rounded-br-lg;
+  }
+
+  .alert {
+    @apply rounded-lg;
+  }
+
+  .btn {
+    @apply rounded-lg;
+  }
+}
+
+/* Typeahead */
+.typeahead input {
+  @apply input input-bordered !rounded-none !rounded-tr-lg !rounded-br-lg;
+}
+
+.dropdown-menu {
+  @apply absolute top-0 left-0 z-10 max-h-72 !w-auto min-w-[190px] !rounded-md  border-x border-y border-base-content/20 bg-white text-left drop-shadow-lg;
+}
+
+.dropdown-menu .dropdown-item {
+  @apply block w-full whitespace-nowrap py-1 px-4 text-sm;
+}
+
+.dropdown-menu .dropdown-item.active {
+  @apply rounded-none bg-accent;
+}
+
+.dropdown-menu .rbt-highlight-text {
+  @apply rounded-none bg-transparent font-bold;
+}
+
+/* Barcode Scanner */
+.scanner {
+  @apply grid;
+}
+
+.scanner video {
+  @apply z-10 col-start-1 row-start-1 h-full w-full;
+}
+
+.scanner canvas {
+  @apply z-20 col-start-1 row-start-1 h-full w-full;
+}
+
+.scanner br {
+  @apply hidden;
+}
+
+.viewport {
+  @apply relative;
+}
+
+.viewport canvas {
+  @apply absolute top-0 left-0;
+}
+
+/* Alert Icon */
 .input-error-msg::before {
   display: inline;
   content: "⚠ ";

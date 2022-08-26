@@ -2,33 +2,7 @@
 
 export interface Typegen0 {
   "@@xstate/typegen": true;
-  eventsCausingActions: {
-    submit: "SUBMIT";
-    idle:
-      | "xstate.after(2000)#Outgoing Form.recordCreated"
-      | "xstate.after(2000)#Outgoing Form.recordUpdated"
-      | "xstate.after(2000)#Outgoing Form.apiError";
-    creatingRecord: "SUBMIT";
-    resetForm:
-      | "done.invoke.Outgoing Form.creatingRecord:invocation[0]"
-      | "done.invoke.Outgoing Form.updatingRecord:invocation[0]";
-    recordCreated: "done.invoke.Outgoing Form.creatingRecord:invocation[0]";
-    updatingRecord: "error.platform.Outgoing Form.creatingRecord:invocation[0]";
-    recordUpdated: "done.invoke.Outgoing Form.updatingRecord:invocation[0]";
-    apiError:
-      | "error.platform.Outgoing Form.creatingRecord:invocation[0]"
-      | "error.platform.Outgoing Form.updatingRecord:invocation[0]";
-  };
   internalEvents: {
-    "xstate.after(2000)#Outgoing Form.recordCreated": {
-      type: "xstate.after(2000)#Outgoing Form.recordCreated";
-    };
-    "xstate.after(2000)#Outgoing Form.recordUpdated": {
-      type: "xstate.after(2000)#Outgoing Form.recordUpdated";
-    };
-    "xstate.after(2000)#Outgoing Form.apiError": {
-      type: "xstate.after(2000)#Outgoing Form.apiError";
-    };
     "done.invoke.Outgoing Form.creatingRecord:invocation[0]": {
       type: "done.invoke.Outgoing Form.creatingRecord:invocation[0]";
       data: unknown;
@@ -47,6 +21,15 @@ export interface Typegen0 {
       type: "error.platform.Outgoing Form.updatingRecord:invocation[0]";
       data: unknown;
     };
+    "xstate.after(2000)#Outgoing Form.apiError": {
+      type: "xstate.after(2000)#Outgoing Form.apiError";
+    };
+    "xstate.after(2000)#Outgoing Form.recordCreated": {
+      type: "xstate.after(2000)#Outgoing Form.recordCreated";
+    };
+    "xstate.after(2000)#Outgoing Form.recordUpdated": {
+      type: "xstate.after(2000)#Outgoing Form.recordUpdated";
+    };
     "xstate.init": { type: "xstate.init" };
   };
   invokeSrcNameMap: {
@@ -59,6 +42,24 @@ export interface Typegen0 {
     guards: never;
     delays: never;
   };
+  eventsCausingActions: {
+    apiError:
+      | "error.platform.Outgoing Form.creatingRecord:invocation[0]"
+      | "error.platform.Outgoing Form.updatingRecord:invocation[0]";
+    creatingRecord: "SUBMIT";
+    idle:
+      | "xstate.after(2000)#Outgoing Form.apiError"
+      | "xstate.after(2000)#Outgoing Form.recordCreated"
+      | "xstate.after(2000)#Outgoing Form.recordUpdated"
+      | "xstate.init";
+    recordCreated: "done.invoke.Outgoing Form.creatingRecord:invocation[0]";
+    recordUpdated: "done.invoke.Outgoing Form.updatingRecord:invocation[0]";
+    resetForm:
+      | "done.invoke.Outgoing Form.creatingRecord:invocation[0]"
+      | "done.invoke.Outgoing Form.updatingRecord:invocation[0]";
+    submit: "SUBMIT";
+    updatingRecord: "error.platform.Outgoing Form.creatingRecord:invocation[0]";
+  };
   eventsCausingServices: {
     createRecord: "SUBMIT";
     updateRecord: "error.platform.Outgoing Form.creatingRecord:invocation[0]";
@@ -66,11 +67,11 @@ export interface Typegen0 {
   eventsCausingGuards: {};
   eventsCausingDelays: {};
   matchesStates:
-    | "idle"
+    | "apiError"
     | "creatingRecord"
+    | "idle"
     | "recordCreated"
-    | "updatingRecord"
     | "recordUpdated"
-    | "apiError";
+    | "updatingRecord";
   tags: never;
 }

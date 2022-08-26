@@ -11,7 +11,7 @@ export const handler: Handler = async (event) => {
   try {
     await client
       .getSpace(process.env.CONTENTFUL_SPACE_ID)
-      .then((space) => space.getEnvironment("master"))
+      .then((space) => space.getEnvironment(process.env.CONTENTFUL_ENVIRONMENT))
       .then((environment) => environment.getEntry(toteId))
       .then((entry) => {
         entry.fields.customerName["en-US"] = customerName;

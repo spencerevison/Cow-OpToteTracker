@@ -103,23 +103,23 @@ export const outgoingFormMachine =
           context.alertStatus = NEUTRAL;
         },
         updatingRecord: (context) => {
-          context.msg = "Duplicate record found.";
+          context.msg = "That tote has already been logged out.";
           context.alertStatus = WARNING;
         },
         recordUpdated: (context) => {
-          context.msg = "Record has been updated.";
+          context.msg = "Tote info has been updated.";
           context.alertStatus = SUCCESS;
         },
         creatingRecord: (context) => {
-          context.msg = "Creating new record...";
+          context.msg = "Logging out tote...";
           context.alertStatus = NEUTRAL;
         },
         recordCreated: (context) => {
-          context.msg = "New record created.";
+          context.msg = "Tote logged out successfully.";
           context.alertStatus = SUCCESS;
         },
         apiError: (context, event) => {
-          context.msg = "Oops! An error was encountered.";
+          context.msg = "Doh! Something went wrong.";
           context.alertStatus = ERROR;
         },
       },

@@ -9,6 +9,15 @@ module.exports = {
     darkTheme: "dark",
   },
   theme: {
+    borderRadius: {
+      none: "0",
+      sm: "0.125rem",
+      DEFAULT: "0.25rem",
+      md: "0.375rem",
+      lg: "1rem",
+      full: "9999px",
+    },
+
     extend: {
       fontFamily: {
         sans: [
