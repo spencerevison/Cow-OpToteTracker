@@ -11,11 +11,13 @@ export const handler: Handler = async (event) => {
     nameRecords = await client
       .getSpace(process.env.CONTENTFUL_SPACE_ID)
       .then((space) => space.getEnvironment(process.env.CONTENTFUL_ENVIRONMENT))
-      .then((environment) => environment.getEntries())
+      .then((environment) => environment.getEntries({ limit: 1000 }))
       .then((response) => {
         const names = [];
+        console.log(response.items.length);
         response.items.forEach((item) => {
           const name = item.fields.customerName["en-US"];
+          console.log(name);
           if (name && name !== "" && !names.includes(name)) {
             names.push(name);
           }
